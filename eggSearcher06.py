@@ -25,6 +25,7 @@ def readserial(ser, numlines):
     return 'read in ' + str(numlines) + 'lines'
 
 def rtcinit (ser):
+    rtccmd= ['restore defaults\n', 'use ntp\n', 'tz_off -4\n', 'backup tz\n', 'ssid WickedDevice\n', 'pwd wildfire123\n', 'exit\n']
     ser.write('restore defaults\n')
     print 'restore defaults\n'
     time.sleep(2)
