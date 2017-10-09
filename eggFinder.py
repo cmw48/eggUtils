@@ -16,8 +16,8 @@ for p in ports:
            # To search this p data, use p[2].
 
 
-   
-   while count < 255:   # Loop checks "COM0" to "COM254" for egg Port Info. 
+
+   while count < 255:   # Loop checks "COM0" to "COM254" for egg Port Info.
 
       if "FTDI" in p[2]:  # Looks for "FTDI" in P[1].
             print "EEEEGGGG! on " + p[0]
@@ -27,8 +27,8 @@ for p in ports:
             #comportnameStr = "COM" + comportnumberStr # add the strings together.
             print "Found AQE on " + comportnameStr
             count = 255 # Causes loop to end.
-            
-            
+
+
       #if "FTDI" in p[2] and comportnameStr in p[1]: # Looks for "FTDI" and "COM#"
       #   print "Found AQE on " + comportnameStr
       #   count = 255 # Causes loop to end.
@@ -58,15 +58,15 @@ rcv1 = ""
 
 rcv1 = ser.readline()
 print rcv1
+str1 = ser.readline()
+while int1==0:
+   str1 = ser.readline()
+   #if "\n" not in str1:        # concatenates string on one line till a line feed "\n"
+   #    str2 = ser.readline()    # is found, then prints the line.
+   #str1 += str2
+   print(str1)
+   str1=""
+   time.sleep(.1)
 
-#while int1==0:
-
-#   if "\n" not in str1:        # concatinates string on one line till a line feed "\n"
-#      str2 = ser.readline()    # is found, then prints the line.
-#      str1 += str2
-#   print(str1)
-#   str1=""
-#   time.sleep(.1)
-
-print 'serial closed'
-ser.close()
+#print 'serial closed'
+#ser.close()

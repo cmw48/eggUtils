@@ -3,6 +3,7 @@ import sys
 import time
 import serial.tools.list_ports
 
+print "initializing..."
 serPort = ""
 totalPorts = 0
 count = 0
@@ -10,7 +11,7 @@ comportInteger = 0
 comportnameStr = ""
 comportnumberStr = ""
 eggNotFound = True
-
+print "Ready!"
 while eggNotFound:
 
     # Find Live Ports
@@ -21,8 +22,8 @@ while eggNotFound:
         totalPorts = len(p)
         print "there are " + str(totalPorts) + " com ports available"
 
-   
-        while count < totalPorts:   # Loop checks "COM0" to "COM254" for egg Port Info. 
+
+        while count < totalPorts:   # Loop checks "COM0" to "COM254" for egg Port Info.
 
           if "FTDI" in p[2]:  # Looks for "FTDI" in P[1].
             print "EEEEGGGG! on " + p[0]
@@ -33,19 +34,19 @@ while eggNotFound:
             print "Found AQE on " + comportnameStr
             eggNotFound = False
             count = 255 # Causes loop to end.
-            
-            
+
+
           #if "FTDI" in p[2] and comportnameStr in p[1]: # Looks for "FTDI" and "COM#"
           #   print "Found AQE on " + comportnameStr
           #   count = 255 # Causes loop to end.
 
           if count == totalPorts-1:
              print "egg not found!"
-             count = totalPorts  #kick out of this while loop and read ports again 
+             count = totalPorts  #kick out of this while loop and read ports again
              time.sleep(.5)
              #sys.exit() # Terminates Script.
         count = count + 1
-
+    print "egg not found, scanning ports..."
     time.sleep(2)  # pause before looping again# check ports again in 5 seconds
 time.sleep(2)  # Gives user 5 seconds to view Port information -- can be   changed/removed.
 
@@ -61,19 +62,31 @@ ser.flushInput()
 ser.flushOutput()
 print "connected to port " + comportnameStr
 
-readten = True
+read21 = True
+read102 = True
 readcount = 0
 
-while readten:
+while read21:
+  rcv1 = ""
+  rcv1 = ser.readline()
+  words = rcv1.split()
+  print rcv1
+  print words
+  readcount = readcount + 1
+  if readcount > 21:
+    read21 = False
+
+ser.write('aqe\n')
+
+while read102:
   rcv1 = ""
   rcv1 = ser.readline()
   print rcv1
   readcount = readcount + 1
-  if readcount > 10:
-    readten = False
-    
-  
-  
+  if readcount > 102:
+    read102 = False
+
+
 #int1 = 0
 #str1 = ""
 #str2 = ""
@@ -87,5 +100,40 @@ while readten:
 #   str1=""
 #   time.sleep(.1)
 
+
+
+ser.write('restore defaults\n')
+time.sleep(1)
+ser.write('use ntp\n')
+time.sleep(1)
+ser.write('tz_off -4\n')
+time.sleep(1)
+ser.write('backup tz\n')
+time.sleep(1)
+ser.write('ssid WickedDevice\n')
+time.sleep(1)
+ser.write('pwd wildfire123\n')
+time.sleep(1)
+ser.write('exit\n')
+time.sleep(1)
+
+
 print 'serial closed'
 ser.close()
+ser.open()   # Reopen the port.
+
+ser.flushInput()
+ser.flushOutput()
+print "connected to port " + comportnameStr
+
+read200 = True
+
+readcount = 0
+
+while read200:
+  rcv1 = ""
+  rcv1 = ser.readline()
+  print rcv1
+  readcount = readcount + 1
+  if readcount > 200:
+    read200 = False
