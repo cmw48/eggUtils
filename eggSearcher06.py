@@ -6,7 +6,7 @@ import sys
 import time
 import serial.tools.list_ports
 
-# declare once with bogus values
+# declare once
 ser = serial.Serial()
 
 def readserial(ser, numlines):
@@ -24,29 +24,12 @@ def readserial(ser, numlines):
             readmore = False
     return 'read in ' + str(numlines) + 'lines'
 
-def rtcinit (ser):
-    rtccmd= ['restore defaults\n', 'use ntp\n', 'tz_off -4\n', 'backup tz\n', 'ssid WickedDevice\n', 'pwd wildfire123\n', 'exit\n']
-    ser.write('restore defaults\n')
-    print 'restore defaults\n'
-    time.sleep(2)
-    ser.write('use ntp\n')
-    print 'use ntp\n'
-    time.sleep(2)
-    ser.write('tz_off -4\n')
-    print 'tz_off -4\n'
-    time.sleep(2)
-    ser.write('backup tz\n')
-    print 'backup tz\n'
-    time.sleep(2)
-    ser.write('ssid WickedDevice\n')
-    print 'ssid WickedDevice\n'
-    time.sleep(2)
-    ser.write('pwd wildfire123\n')
-    print 'pwd wildfire123\n'
-    time.sleep(2)
-    ser.write('exit\n')
-    print 'exit\n'
-    time.sleep(2)
+def cmd (ser, cmdlist):
+    for cmd in rtccmd:
+        ser.write(rtccmd)
+        print rtccmd
+        time.sleep(2)
+
 
 def main():
 
@@ -111,10 +94,11 @@ def main():
     #CO2 egg has a 16 line header
     readserial(ser, 16)
 
-    ser.write('aqe\n')
+    cfgcmd= ['aqe\n', 'use ntp\n', 'tz_off -4\n', 'backup tz\n', 'ssid WickedDevice\n', 'pwd wildfire123\n', 'exit\n']
+
 
     readserial(ser, 102)
-
+    rtccmd= ['restore defaults\n', 'use ntp\n', 'tz_off -4\n', 'backup tz\n', 'ssid WickedDevice\n', 'pwd wildfire123\n', 'exit\n']
 
 
     print 'closing serial port...'

@@ -1,96 +1,250 @@
 import serial
 import sys
 import time
+import datetime
 import serial.tools.list_ports
 
-serPort = ""
-totalPorts = 0
-count = 0
-eggComPort = ""
-eggCount = 0
+# declare once
+ser = serial.Serial()
 
-eggNotFound = True
+class Egg:
 
-while eggNotFound:
+    def __init__(self):
+        self.eggserial = ''
+        self.eggtype = ''
+        self.eggversion = ''
+        self.tzoff = ''
+        self.wdpass = False
+        self.slotpass = False
+        self.spipass = False
+        self.sdpass = False
+        self.sht25pass = False
+        self.rtcpass = False
+        self.esppass = False
+        self.firmsig = ''
+        self.ntpok = False
 
-    # Find Live Ports
-    ports = list(serial.tools.list_ports.comports())
-    totalPorts = len(ports)
-    print "there are " + str(totalPorts) + " com ports available"
-    
-    for p in ports:
-        print p # This causes each port's information to be printed out.
-        # To search this p data, use p[2].
 
-        if "FTDI" in p[2]:  # Looks for "FTDI" in P[2].
-            print "there is an air quality egg on " + p[0]
-            eggComPort = p[0]
-            print "Found AQE on " + eggComPort
-            eggNotFound = False
-            #note- as soon as any egg is found, loop ends.
-            eggCount = eggCount + 1
+    def introduce(self):
+        print('eggserial {1}, eggtype {2}, firmware version {3}'.format(self, self.eggserial, self.eggtype, self.eggversion))
 
-        if "USB VID:PID" in p[2]:  # Looks for "PID" in P[2].
-            print "LINUX! there is an air quality egg on " + p[0]
-            eggComPort = p[0]
-            print "Found AQE on " + eggComPort
-            eggNotFound = False
-            #note- as soon as any egg is found, loop ends.
-            eggCount = eggCount + 1
-            
-        if count == totalPorts-1:
-            if eggNotFound:
-                print "egg not found!"
-                time.sleep(.5)
+    def passeggtests(self):
+        print('wdpass {1}, slotpass {2},  spipass {3}, sdpass {4}, sht25pass {5}, rtcpass {6}, esppass {7} '.format(self, self.wdpass, self.slotpass, self.spipass, self.sdpass, self.sht25pass, self.rtcpass, self.esppass))
+
+    def rtctest(self):
+        print('tzoff {1}, ntpok {2} '.format(self, self.tzoff, self.ntpok))
+
+
+thisEgg = Egg()
+#myegg = Egg("egg0080huey")
+#otheregg = Egg("egg0080louie")
+#myegg.introduce()
+#otheregg.introduce()
+
+def parseEggData(thisEgg, words):
+    ignoreline = False
+    numwords = len(words)
+    if numwords > 3:
+        try:
+            if words[1] == "CO2":
+                thisEgg.eggtype = 'CO2'
+
+            elif words[1] == "Firmware":
+                thisEgg.eggversion = words[3]
+
+            elif words[1] == 'Serial':
+                thisEgg.eggserial = words[3]
+
+            elif words[1] == "TZ":
+                thisEgg.tzoff = words[3]
+
+            elif words[1] == "Tiny":
+                if words[3]  == 'Initialization...OK.':
+                    thisEgg.wdpass = True
+
+            elif words[1] == "Slot":
+                if words[4]  == 'Initialization...OK.':
+                    thisEgg.slotpass = True
+
+            elif words[1] == 'SPI':
+                if words[3]  == 'Initialization...OK.':
+                    thisEgg.spipass = True
+
+            elif words[1] == "SD":
+                if words[3]  == 'Initialization...OK.':
+                    thisEgg.sdpass = True
+
+            elif words[1] == "SHT25":
+                if words[2]  == 'Initialization...OK.':
+                    thisEgg.sht25pass = True
+
+            elif words[1] == 'RTC':
+                if words[2]  == 'Initialization...OK.':
+                    thisEgg.rtcpass = True
+
+            elif words[1] == "ESP8266":
+                if words[3]  == 'Initialization...OK.':
+                    thisEgg.esppass = True
+
+            elif words[1] == "Getting":
+                if words[2] == "NTP":
+                    print 'debug: ntp test'
+                    now = datetime.datetime.now()
+                    timehack = now.strftime("%H:%M:%S")
+                    ntptime = str(words[4])
+                    print timehack
+                    print ntptime
+                    timehour = timehack[:2]
+                    ntphour = ntptime[:2]
+                    timemin = timehack[3:5]
+                    ntpmin = ntptime[3:5]
+                    print timemin
+                    print ntpmin
+                    if timehour == ntphour:
+                        timediff = int(ntpmin)- int(timemin)
+                        if abs(timediff) < 5:
+                            thisEgg.ntpok = True
+
+            elif words[1] == "Current":
+                firmwaresig = str(words[4]) + str(words[5])
+                thisEgg.firmsig = firmwaresig
+
             else:
-                print "There were " + str(eggCount) + " eggs found."
-                
-            
-                #count = totalPorts  #kick out of this while loop and read ports again 
+                # don't set any eggvars
+                pass
 
-            #sys.exit() # Terminates Script.
-        #count = count + 1
+            if words[0] == "MAC":
+                thisEgg.macaddr = words[2]
 
-    time.sleep(2)  # pause before looping again# check ports again in 5 seconds
-time.sleep(2)  # Gives user 5 seconds to view Port information -- can be   changed/removed.
+            elif words[0] == "MQTT":
+                if words[1] == "Server":
+                    thisEgg.mqtthost = words[2]
 
-# Set Port
-ser = serial.Serial(eggComPort, 115200, timeout=10) # Put in your speed and timeout value.
+            elif words[0] == "Temperature":
+                thisEgg.tempoff = words[4]
 
-# This begins the opening and printout of data from the Adruino.
+            elif words[0] == "Humidity":
+                thisEgg.tempoff = words[4]
 
-ser.close()  # In case the port is already open this closes it.
-ser.open()   # Reopen the port.
+            elif words[0] == "csv:":
+                print 'debug: csv!'
+                now = datetime.datetime.now()
+                csvdate = now.strftime("%m/%d/%y")
+                print csvdate
+                print str(words[2])
+                if str(words[2]) == csvdate:
+                    print (str(words[2]) + ', ' + str(words[3]) + ', ' + str(words[4]))
+        except:
+            pass
+            print sys.exc_info()[0]
 
-ser.flushInput()
-ser.flushOutput()
-print "connected to port " + eggComPort
 
-readten = True
-readcount = 0
+def readserial(ser, numlines):
+    readcount = 0
+    readmore = True
+    while readmore:
+        rcv1 = ""
+        rcv1 = ser.readline()
+        words = rcv1.split()
+        parseEggData(thisEgg, words)
+        #print rcv1
+        print '(' + str(readcount) + ') ' + str(words)
+        readcount = readcount + 1
+        if readcount > numlines:
+            readcount = 0
+            readmore = False
+            print 'finished reading...'
+    print 'read in ' + str(numlines) + ' lines'
 
-while readten:
-  rcv1 = ""
-  rcv1 = ser.readline()
-  print rcv1
-  readcount = readcount + 1
-  if readcount > 10:
-    readten = False
-    
-  
-  
-#int1 = 0
-#str1 = ""
-#str2 = ""
+def cmd (ser, cmdlist):
+    for cmd in cmdlist:
+        ser.write(cmd)
+        print cmd
+        time.sleep(2)
+    return 'command list processed...'
 
-#while int1==0:
+def main():
 
-#   if "\n" not in str1:        # concatinates string on one line till a line feed "\n"
-#      str2 = ser.readline()    # is found, then prints the line.
-#      str1 += str2
-#   print(str1)
-#   str1=""
-#   time.sleep(.1)
+    print 'initializing...'
+    serPort = ""
+    totalPorts = 0
+    count = 0
+    eggComPort = ""
+    eggCount = 0
+    processcmd = ""
+    eggNotFound = True
 
-print 'serial closed'
-ser.close()
+    while eggNotFound:
+
+        # Find Live Ports
+        ports = list(serial.tools.list_ports.comports())
+        totalPorts = len(ports)
+        print "there are " + str(totalPorts) + " com ports available"
+
+        for p in ports:
+            print p # This causes each port's information to be printed out.
+            # To search this p data, use p[2].
+
+            if "FTDI" in p[2]:  # Looks for "FTDI" in P[2].
+                print "there is an air quality egg on " + p[0]
+                eggComPort = p[0]
+                print "Found AQE on " + eggComPort
+                eggNotFound = False
+                #note- as soon as any egg is found, loop ends.
+                eggCount = eggCount + 1
+
+            if "USB VID:PID" in p[2]:  # Looks for "PID" in P[2].
+                print "LINUX! there is an air quality egg on " + p[0]
+                eggComPort = p[0]
+                print "Found AQE on " + eggComPort
+                eggNotFound = False
+                #note- as soon as any egg is found, loop ends.
+                eggCount = eggCount + 1
+
+            if count == totalPorts-1:
+                if eggNotFound:
+                    print "egg not found!"
+                    time.sleep(.5)
+                else:
+                    print "There were " + str(eggCount) + " eggs found."
+
+                    #count = totalPorts  #kick out of this while loop and read ports again
+
+                #sys.exit() # Terminates Script.
+            #count = count + 1
+
+        time.sleep(2)  # pause before looping again-  check ports again in 2 seconds
+    time.sleep(2)  # Gives user 2 seconds to view Port information
+
+    # Set Port
+    ser = serial.Serial(eggComPort, 115200, timeout=10) # Put in your speed and timeout value.
+    ser.close()  # In case the port is already open this closes it.
+    ser.open()   # Reopen the port.
+
+    ser.flushInput()
+    ser.flushOutput()
+    print "connected to port " + eggComPort
+
+    #CO2 egg has a 16 line header
+    readserial(ser, 16)
+    thisEgg.introduce()
+
+    processcmd = cmd(ser, ['aqe\n'])
+    time.sleep(2)
+    readserial(ser, 75)
+    time.sleep(5)
+
+    thisEgg.passeggtests()
+    thisEgg.rtctest()
+
+    processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off -4\n', 'backup tz\n', 'ssid WickedDevice\n', 'pwd wildfire123\n', 'exit\n'])
+    #processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off -4\n', 'backup tz\n', 'ssid Acknet\n', 'pwd millicat75\n', 'exit\n'])
+
+    #print 'bouncing serial port...'
+    #ser.close()  # In case the port is already open this closes it.
+    #ser.open()   # Reopen the port.
+
+    readserial(ser, 300)
+
+if __name__ == "__main__":
+    main()
