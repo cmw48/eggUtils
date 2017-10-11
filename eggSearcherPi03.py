@@ -3,9 +3,11 @@ import sys
 import time
 import datetime
 import serial.tools.list_ports
+import traceback
 
 # declare once
 ser = serial.Serial()
+
 
 class Egg:
 
@@ -23,6 +25,12 @@ class Egg:
         self.esppass = False
         self.firmsig = ''
         self.ntpok = False
+        self.firstread = []
+        self.macaddr = ''
+        self.mqtthost = ''
+        self.ssid = ''
+        self.tempoff = 0.0
+        self.humoff = 0.0
 
 
     def introduce(self):
@@ -30,12 +38,55 @@ class Egg:
 
     def passeggtests(self):
         print('wdpass {1}, slotpass {2},  spipass {3}, sdpass {4}, sht25pass {5}, rtcpass {6}, esppass {7} '.format(self, self.wdpass, self.slotpass, self.spipass, self.sdpass, self.sht25pass, self.rtcpass, self.esppass))
+        if wdpass and slotpass and spipass and sdpass and sht25pass and rtcpass and esppass:
+            print 'all self tests PASS'
 
     def rtctest(self):
         print('tzoff {1}, ntpok {2} '.format(self, self.tzoff, self.ntpok))
 
+    def finaltest(self):
+        print self.eggserial
+        print self.macaddr
+        print self.mqtthost
+        allpass = True
+        if self.eggversion == '2.2.1':
+            print 'Firmware version ' + self.eggversion + ': PASS'
+        else:
+            print 'Firmware version ' + self.eggversion + ': FAIL'
+            allpass = False
+        if self.rtcpass == True:
+            rtcok = True
+            if self.tzoff == '-4.000000000':
+                print 'tz set to ' + self.tzoff + ': PASS'
+            else:
+                print 'tz set to ' + self.tzoff + ': FAIL'
+                rtcok = False
+            if self.ntpok == True:
+                print 'ntp time correct PASS'
+            else:
+                print 'ntp time differs from local time FAIL'
+                rtcok = False
+            if rtcok:
+                print 'real time clock set up and correct PASS'
+            else:
+                print 'real time clock incorrect FAIL'
+                allpass = False
+        self.rtctest()
+
+        if wdpass and slotpass and spipass and sdpass and sht25pass and rtcpass and esppass:
+            print 'all self tests PASS'
+        else:
+            print 'self test FAIL'
+            allpass = False
+        self.passeggtests()
+
+        if (self.tempoff <> 0) and (self.humoff <> 0):
+            print 'temp and humidity offsets entered PASS'
+        else:
+            print 'temp and/or humidity offsets not entered FAIL'
 
 thisEgg = Egg()
+filelist = []
 #myegg = Egg("egg0080huey")
 #otheregg = Egg("egg0080louie")
 #myegg.introduce()
@@ -44,6 +95,8 @@ thisEgg = Egg()
 def parseEggData(thisEgg, words):
     ignoreline = False
     numwords = len(words)
+    csvdate = ''
+    #print 'debug! number of words ' + str(numwords)
     if numwords > 3:
         try:
             if words[1] == "CO2":
@@ -80,18 +133,6 @@ def parseEggData(thisEgg, words):
                 if words[3]  == 'Initialization...OK.':
                     thisEgg.sdpass = True
 
-            elif words[1] == "SHT25":
-                if words[2]  == 'Initialization...OK.':
-                    thisEgg.sht25pass = True
-
-            elif words[1] == 'RTC':
-                if words[2]  == 'Initialization...OK.':
-                    thisEgg.rtcpass = True
-
-            elif words[1] == "ESP8266":
-                if words[3]  == 'Initialization...OK.':
-                    thisEgg.esppass = True
-
             elif words[1] == "Getting":
                 if words[2] == "NTP":
                     print 'debug: ntp test'
@@ -126,37 +167,100 @@ def parseEggData(thisEgg, words):
                 thisEgg.tempoff = words[4]
 
             elif words[0] == "Humidity":
-                thisEgg.tempoff = words[4]
+                thisEgg.humoff = words[4]
 
-            elif words[0] == "csv:":
-                print 'debug: csv!'
-                now = datetime.datetime.now()
-                csvdate = now.strftime("%m/%d/%y")
-                print csvdate
-                print str(words[2])
-                if str(words[2]) == csvdate:
-                    print (str(words[2]) + ', ' + str(words[3]) + ', ' + str(words[4]))
             else:
                 # don't set any eggvars
                 pass
+        except:
+            print sys.exc_info()[0]
+            print traceback.format_exc()
+
+    elif numwords == 3:
+        try:
+
+            if words[1] == 'SHT25':
+                if words[2]  == 'Initialization...OK.':
+                    thisEgg.sht25pass = True
+
+            elif words[1] == 'RTC':
+                if words[2]  == 'Initialization...OK.':
+                    thisEgg.rtcpass = True
+
+            elif words[1] == 'ESP8266':
+                if words[2]  == 'Initialization...OK.':
+                    thisEgg.esppass = True
+
+            elif words[0] == "csv:":
+                print 'debug: csv!'
+                rightnow = datetime.datetime.now()
+                csvdate = rightnow.strftime("%m/%d/%y")
+                print csvdate
+                print str(words[2])
+                #TODO: need a pass fail condition
+
+            elif str(words[2]) == csvdate:
+                firstread = { 'serial' : thisEgg.serial, 'time' : str(words[2]), 'temp' : str(words[3]), 'hum' : str(words[4])}
+                print firstread
+                thisEgg.firstread = firstread
+                thisEgg.uploadok = True
+
+            elif words[1] == 'Done':
+                if words[2]  == 'downloading.':
+                    print 'Debug!  Download finished.'
+                    return
+
+            else:
+                pass
+                # do we care about any other two (three) word lines?
+        except:
+            print sys.exc_info()[0]
+            print traceback.format_exc()
+
+    elif numwords == 2:
+        try:
+            lenfirstword = len(words[0])
+            filenametest = str(words[0])
+            filenameext = filenametest[-4:]
+            if filenameext == ".csv":
+                filename = filenametest
+                filedate = filenametest[:8]
+                filelist.append(filename)
+                thisEgg.downloadok = True
+                print 'DEBUG! ' + filename + " , " + filedate
+                print 'DEBUG! ' + str(filelist)
+            else:
+                # some other two word combo we are interested in
+                # otherwise, drop it on the floor
+                pass
+        except:
+            print sys.exc_info()[0]
+            print traceback.format_exc()
+
+    elif numwords == 1:
+        try:
+            pass
 
         except:
-            pass
             print sys.exc_info()[0]
-
+            print traceback.format_exc()
 
 def readserial(ser, numlines):
+    continuereading = True
     readcount = 0
     readmore = True
     while readmore:
         rcv1 = ""
         rcv1 = ser.readline()
         words = rcv1.split()
-        parseEggData(thisEgg, words)
+        continuereading = parseEggData(thisEgg, words)
+        if continuereading == False:
+            readmore = False
         #print rcv1
-        print '(' + str(readcount) + ') ' + str(words)
+        #print '(' + str(readcount) + ') ' + str(words)
+        print '(' + str(readcount) + ') ' + rcv1
         readcount = readcount + 1
-        if readcount > numlines:
+        if (readcount > numlines):
             readcount = 0
             readmore = False
             print 'finished reading...'
@@ -166,7 +270,7 @@ def cmd (ser, cmdlist):
     for cmd in cmdlist:
         ser.write(cmd)
         print cmd
-        time.sleep(2)
+        time.sleep(3)
     return 'command list processed...'
 
 def main():
@@ -174,7 +278,7 @@ def main():
     print 'initializing...'
     serPort = ""
     totalPorts = 0
-    count = 0
+    portcount = 0
     eggComPort = ""
     eggCount = 0
     processcmd = ""
@@ -207,17 +311,17 @@ def main():
                 #note- as soon as any egg is found, loop ends.
                 eggCount = eggCount + 1
 
-            if count == totalPorts-1:
+            if portcount == totalPorts-1:
                 if eggNotFound:
                     print "egg not found!"
                     time.sleep(.5)
                 else:
                     print "There were " + str(eggCount) + " eggs found."
 
-                    #count = totalPorts  #kick out of this while loop and read ports again
+                    #portcount = totalPorts  #kick out of this while loop and read ports again
 
                 #sys.exit() # Terminates Script.
-            #count = count + 1
+            #portcount = portcount + 1
 
         time.sleep(2)  # pause before looping again-  check ports again in 2 seconds
     time.sleep(2)  # Gives user 2 seconds to view Port information
@@ -265,16 +369,43 @@ def main():
     time.sleep(5)
 
     thisEgg.passeggtests()
-    thisEgg.rtctest()
+
 
     processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off -4\n', 'backup tz\n', 'ssid WickedDevice\n', 'pwd wildfire123\n', 'exit\n'])
     #processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off -4\n', 'backup tz\n', 'ssid Acknet\n', 'pwd millicat75\n', 'exit\n'])
+    time.sleep(2)
+    thisEgg.rtctest()
 
     #print 'bouncing serial port...'
     #ser.close()  # In case the port is already open this closes it.
     #ser.open()   # Reopen the port.
 
-    readserial(ser, 300)
+    readserial(ser, 72)
+    ser.close()  # In case the port is already open this closes it.
+    ser.open()   # Reopen the port.
+
+    print "reconnecting to port " + eggComPort
+    time.sleep(3)
+    processcmd = cmd(ser, ['aqe\n'])
+    time.sleep(4)
+    processcmd = cmd(ser, ['restore defaults\n'])
+    time.sleep(3)
+    processcmd = cmd(ser, ['opmode offline\n', 'exit\n'])
+    ser.close()  # In case the port is already open this closes it.
+    ser.open()   # Reopen the port.
+    readserial(ser, 50)
+    ser.close()  # In case the port is already open this closes it.
+    ser.open()   # Reopen the port.
+    print "reconnecting to port " + eggComPort
+    time.sleep(3)
+    processcmd = cmd(ser, ['aqe\n'])
+    time.sleep(4)
+    processcmd = cmd(ser, ['list files\n'])
+    readserial(ser, 100)
+    processcmd = cmd(ser, ['download ' + str(filelist[0]) + '\n'])
+    readserial(ser, 50)
+    print 'Finished downloading...'
+    thisEgg.finaltest()
 
 if __name__ == "__main__":
     main()
