@@ -38,7 +38,7 @@ class Egg:
 
     def passeggtests(self):
         print('wdpass {1}, slotpass {2},  spipass {3}, sdpass {4}, sht25pass {5}, rtcpass {6}, esppass {7} '.format(self, self.wdpass, self.slotpass, self.spipass, self.sdpass, self.sht25pass, self.rtcpass, self.esppass))
-        if wdpass and slotpass and spipass and sdpass and sht25pass and rtcpass and esppass:
+        if self.wdpass and self.slotpass and self.spipass and self.sdpass and self.sht25pass and self.rtcpass and self.esppass:
             print 'all self tests PASS'
 
     def rtctest(self):
@@ -73,7 +73,7 @@ class Egg:
                 allpass = False
         self.rtctest()
 
-        if wdpass and slotpass and spipass and sdpass and sht25pass and rtcpass and esppass:
+        if self.wdpass and self.slotpass and self.spipass and self.sdpass and self.sht25pass and self.rtcpass and self.esppass:
             print 'all self tests PASS'
         else:
             print 'self test FAIL'
