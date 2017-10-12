@@ -101,15 +101,8 @@ def parseEggData(thisEgg, words):
     numwords = len(words)
     csvdate = ''
     #print 'debug! number of words ' + str(numwords)
-    if numwords >= 5:
-        try:
-            return 'suppress'
 
-        except:
-            print sys.exc_info()[0]
-            print traceback.format_exc()
-
-    if 3 < numwords < 5:
+    if numwords > 3:
         try:
             if words[1] == "CO2":
                 thisEgg.eggtype = 'CO2'
