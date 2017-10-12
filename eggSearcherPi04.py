@@ -179,6 +179,10 @@ def parseEggData(thisEgg, words):
             elif words[0] == "Humidity":
                 thisEgg.humoff = words[4]
 
+            elif words[1] == 'ESP8266':
+                if words[2]  == 'restoring':
+                    return 'espupd'
+
             else:
                 # don't set any eggvars
                 pass
@@ -280,6 +284,8 @@ def readserial(ser, numlines):
         if parsereturn == 'done':
             print 'Debug! early terminate for readlines'
             readmore = False
+        elif parsereturn == 'espupd':
+            print 'Debug! just got done with ESP8266 update, restart and redo ntp'
         #print rcv1
         #print '(' + str(readcount) + ') ' + str(words)
         #elif parsereturn == 'suppress':
@@ -299,6 +305,41 @@ def cmd (ser, cmdlist):
         print cmd
         time.sleep(3)
     return 'command list processed...'
+
+
+def getconfigmode():
+    processcmd = ''
+    ser.close()  # In case the port is already open this closes it.
+    ser.open()   # Reopen the port.
+    processcmd = cmd(ser, ['aqe\n'])
+    time.sleep(4)
+    #get just enough of header to determine egg type
+    readserial(ser, 6)
+    #thisEgg.introduce()
+    if thisEgg.eggtype == 'CO2':
+        #immediately read 10 more lines
+        readserial(ser, 10)
+    else:
+        #gas egg, immediately read 15 more lines
+        readserial(ser, 13)
+
+    processcmd = cmd(ser, ['aqe\n'])
+    time.sleep(15)
+
+def getsettings():
+    if thisEgg.eggtype == 'CO2':
+        #immediately read 10 more lines
+        readserial(ser, 75)
+    else:
+        #gas egg, immediately read 15 more lines
+        readserial(ser, 99)
+
+    # CO2 egg displays 75 lines after AQE
+    #readserial(ser, 75)
+
+    # gas egg displays 99 lines after AQE
+    #readserial(ser, 99)
+    time.sleep(5)
 
 def main():
 
@@ -372,49 +413,31 @@ def main():
         #gas egg has a 21 line header
         #readserial(ser, 21)
 
-        #get just enough of header to determine egg type
-        readserial(ser, 6)
-        #thisEgg.introduce()
-        if thisEgg.eggtype == 'CO2':
-            #immediately read 10 more lines
-            readserial(ser, 10)
-        else:
-            #gas egg, immediately read 15 more lines
-            readserial(ser, 13)
-
-        processcmd = cmd(ser, ['aqe\n'])
-        time.sleep(15)
-
-
-        if thisEgg.eggtype == 'CO2':
-            #immediately read 10 more lines
-            readserial(ser, 75)
-        else:
-            #gas egg, immediately read 15 more lines
-            readserial(ser, 99)
-
-        # CO2 egg displays 75 lines after AQE
-        #readserial(ser, 75)
-
-        # gas egg displays 99 lines after AQE
-        #readserial(ser, 99)
-        time.sleep(5)
-
+        getconfigmode()
+        getsettings()
         thisEgg.passeggtests()
-
 
         processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off -4\n', 'backup tz\n', 'ssid WickedDevice\n', 'pwd wildfire123\n', 'exit\n'])
         #processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off -4\n', 'backup tz\n', 'ssid Acknet\n', 'pwd millicat75\n', 'exit\n'])
         time.sleep(4)
         thisEgg.rtctest()
 
-        #print 'bouncing serial port...'
-        #ser.close()  # In case the port is already open this closes it.
-        #ser.open()   # Reopen the port.
-
+        #TODO: test for ESP8266 update in here somewhere
         readserial(ser, 90)
         ser.close()  # In case the port is already open this closes it.
         ser.open()   # Reopen the port.
+        getconfigmode()
+        if thisEgg.rtcpass == False:
+            print 'Debug!  Setting NTP and restarting.'
+            getconfigmode()
+            processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off -4\n', 'backup tz\n', 'ssid WickedDevice\n', 'pwd wildfire123\n', 'exit\n'])
+            #processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off -4\n', 'backup tz\n', 'ssid Acknet\n', 'pwd millicat75\n', 'exit\n'])
+            time.sleep(4)
+            readserial(ser, 90)
+            ser.close()  # In case the port is already open this closes it.
+            ser.open()   # Reopen the port.
+        else:
+            print 'RTC okay!'
 
         print "reconnecting to port " + eggComPort
         time.sleep(3)
