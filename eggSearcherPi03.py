@@ -4,6 +4,7 @@ import time
 import datetime
 import serial.tools.list_ports
 import traceback
+import logging
 
 # declare once
 ser = serial.Serial()
@@ -53,7 +54,7 @@ class Egg:
         print self.macaddr
         print self.mqtthost
         allpass = True
-        if self.eggversion == '2.2.1':
+        if self.eggversion == '2.2.2':
             print 'Firmware version ' + self.eggversion + ': PASS'
         else:
             print 'Firmware version ' + self.eggversion + ': FAIL'
@@ -155,7 +156,10 @@ def parseEggData(thisEgg, words):
                     if timehour == ntphour:
                         timediff = int(ntpmin)- int(timemin)
                         if abs(timediff) < 5:
+                            print 'Debug!  time is within 5 mins of system time'
                             thisEgg.ntpok = True
+                        else:
+                            print 'Debug!  RTC time does not match system time'    
 
             elif words[1] == "Current":
                 firmwaresig = str(words[4]) + str(words[5])
@@ -199,7 +203,7 @@ def parseEggData(thisEgg, words):
             elif words[0] == "csv:":
                 # because this line is 3 words, it's a data row
 
-                print 'debug: csv!'
+                #print 'debug: csv!'
                 rightnow = datetime.datetime.now()
                 csvdate = rightnow.strftime("%m/%d/%y")
                 print csvdate,
@@ -214,7 +218,7 @@ def parseEggData(thisEgg, words):
 
             elif words[1] == 'Done':
                 if words[2]  == 'downloading.':
-                    print 'Debug!  Download finished.'
+                #    print 'Debug!  Download finished.'
                     return 'done'
 
             else:
@@ -275,8 +279,8 @@ def readserial(ser, numlines):
             readmore = False
         #print rcv1
         #print '(' + str(readcount) + ') ' + str(words)
-        elif parsereturn == 'suppress':
-            print '.',
+        #elif parsereturn == 'suppress':
+        #   print '.',
         else:
             print '(' + str(readcount) + ') ' + rcv1
         readcount = readcount + 1
@@ -294,6 +298,9 @@ def cmd (ser, cmdlist):
     return 'command list processed...'
 
 def main():
+    logging.basicConfig(filename='eggtest.log', level=logging.INFO)
+    logging.info('Started')
+
 
     print 'initializing...'
     serPort = ""
@@ -393,14 +400,14 @@ def main():
 
     processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off -4\n', 'backup tz\n', 'ssid WickedDevice\n', 'pwd wildfire123\n', 'exit\n'])
     #processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off -4\n', 'backup tz\n', 'ssid Acknet\n', 'pwd millicat75\n', 'exit\n'])
-    time.sleep(2)
+    time.sleep(4)
     thisEgg.rtctest()
 
     #print 'bouncing serial port...'
     #ser.close()  # In case the port is already open this closes it.
     #ser.open()   # Reopen the port.
 
-    readserial(ser, 72)
+    readserial(ser, 80)
     ser.close()  # In case the port is already open this closes it.
     ser.open()   # Reopen the port.
 
@@ -413,7 +420,7 @@ def main():
     processcmd = cmd(ser, ['opmode offline\n', 'exit\n'])
     ser.close()  # In case the port is already open this closes it.
     ser.open()   # Reopen the port.
-    readserial(ser, 50)
+    readserial(ser, 40)
     ser.close()  # In case the port is already open this closes it.
     ser.open()   # Reopen the port.
     print "reconnecting to port " + eggComPort
@@ -426,6 +433,8 @@ def main():
     readserial(ser, 50)
     print 'Finished downloading...'
     thisEgg.finaltest()
+    logging.info(thisEgg.finaltest())
+    logging.info('Finished')
 
 if __name__ == "__main__":
     main()
