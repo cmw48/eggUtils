@@ -201,7 +201,7 @@ def parseEggData(thisEgg, words):
                 print 'debug: csv!'
                 rightnow = datetime.datetime.now()
                 csvdate = rightnow.strftime("%m/%d/%y")
-                print csvdate
+                print csvdate,
                 print str(words[2])
                 #TODO: need a pass fail condition
 
@@ -261,7 +261,7 @@ def parseEggData(thisEgg, words):
             print traceback.format_exc()
 
 def readserial(ser, numlines):
-    continuereading = ''
+    parsereturn = ''
     readcount = 0
     readmore = True
     while readmore:
@@ -269,14 +269,13 @@ def readserial(ser, numlines):
         rcv1 = ser.readline()
         words = rcv1.split()
         parsereturn = parseEggData(thisEgg, words)
-        print 'continue reading = ' + continuereading
         if parsereturn == 'done':
             print 'Debug! early terminate for readlines'
             readmore = False
         #print rcv1
         #print '(' + str(readcount) + ') ' + str(words)
         elif parsereturn == 'suppress':
-            print '.'
+            print '.',
         else:
             print '(' + str(readcount) + ') ' + rcv1
         readcount = readcount + 1
