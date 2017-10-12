@@ -31,6 +31,10 @@ class Egg:
         self.ssid = ''
         self.tempoff = 0.0
         self.humoff = 0.0
+        self.allpass = False
+        self.dlfile = ''
+        self.data = []
+
 
 
     def introduce(self):
@@ -192,6 +196,8 @@ def parseEggData(thisEgg, words):
                     thisEgg.esppass = True
 
             elif words[0] == "csv:":
+                # because this line is 3 words, it's a data row
+
                 print 'debug: csv!'
                 rightnow = datetime.datetime.now()
                 csvdate = rightnow.strftime("%m/%d/%y")
@@ -208,7 +214,7 @@ def parseEggData(thisEgg, words):
             elif words[1] == 'Done':
                 if words[2]  == 'downloading.':
                     print 'Debug!  Download finished.'
-                    return
+                    return 'done'
 
             else:
                 pass
@@ -229,36 +235,50 @@ def parseEggData(thisEgg, words):
                 thisEgg.downloadok = True
                 print 'DEBUG! ' + filename + " , " + filedate
                 print 'DEBUG! ' + str(filelist)
+            elif words[0] == "csv:":
+                # because this line is 2 words, it's a HEADER row
+                print str(words)
+                print 'debug: header row!'
+                #rightnow = datetime.datetime.now()
+                #csvdate = rightnow.strftime("%m/%d/%y")
+                #print csvdate
+                #print str(words[2])
+                #TODO: need a pass fail condition
             else:
-                # some other two word combo we are interested in
-                # otherwise, drop it on the floor
+                # any other 2 word combination we care about
                 pass
+
         except:
             print sys.exc_info()[0]
             print traceback.format_exc()
 
     elif numwords == 1:
         try:
-            pass
+            return 'suppress'
 
         except:
             print sys.exc_info()[0]
             print traceback.format_exc()
 
 def readserial(ser, numlines):
-    continuereading = True
+    continuereading = ''
     readcount = 0
     readmore = True
     while readmore:
         rcv1 = ""
         rcv1 = ser.readline()
         words = rcv1.split()
-        continuereading = parseEggData(thisEgg, words)
-        if continuereading == False:
+        parsereturn = parseEggData(thisEgg, words)
+        print 'continue reading = ' + continuereading
+        if parsereturn == 'done':
+            print 'Debug! early terminate for readlines'
             readmore = False
         #print rcv1
         #print '(' + str(readcount) + ') ' + str(words)
-        print '(' + str(readcount) + ') ' + rcv1
+        elif parsereturn == 'suppress':
+            print '.'
+        else:
+            print '(' + str(readcount) + ') ' + rcv1
         readcount = readcount + 1
         if (readcount > numlines):
             readcount = 0
