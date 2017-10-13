@@ -1,38 +1,232 @@
+INFO:Started
+INFO:initializing...
+DEBUG:there are 1 com ports available
+DEBUG:/dev/ttyUSB0 - FT231X USB UART
+DEBUG:LINUX! there is an air quality egg on /dev/ttyUSB0
+DEBUG:Found AQE on /dev/ttyUSB0
+DEBUG:There were 1 eggs found.
+DEBUG:connected to port /dev/ttyUSB0
+INFO:reading header...
+INFO:wdpass True, slotpass True,  spipass True, sdpass True, sht25pass True, rtcpass True, esppass True 
+INFO:PASSED all self tests
+INFO:setting NTP time...
+INFO:Started
+INFO:initializing...
+DEBUG:there are 1 com ports available
+DEBUG:/dev/ttyUSB0 - FT231X USB UART
+DEBUG:LINUX! there is an air quality egg on /dev/ttyUSB0
+DEBUG:Found AQE on /dev/ttyUSB0
+DEBUG:There were 1 eggs found.
+DEBUG:connected to port /dev/ttyUSB0
+INFO:reading header...
+INFO:wdpass True, slotpass True,  spipass True, sdpass True, sht25pass True, rtcpass True, esppass True 
+INFO:PASSED all self tests
+INFO:setting NTP time...
+INFO:FAIL - tz offset: -4.000000000NTP set: False
+INFO:restarting...
+DEBUG:reconnecting to port /dev/ttyUSB0
+INFO:setting offline mode...
+INFO:restarting...
+INFO:writing offline data...
+INFO:
+INFO:10/13/17
+INFO:03:03:25,22.72,67.22,1714.0,0.0,---,---,---
+INFO:10/13/17
+INFO:03:04:25,22.72,67.19,1713.5,---,---,---,---
+INFO:10/13/17
+INFO:03:05:25,22.72,67.15,1712.8,---,---,---,---
+INFO:restarting...
+DEBUG:reconnecting to port /dev/ttyUSB0
+INFO:reading files on SD card...
+DEBUG:Finished downloading...
+INFO:egg0080425047280130
+INFO:
+INFO:
+INFO:PASS
+INFO:Firmware version 2.2.2
+INFO:PASS
+INFO:tz set to -4.000000000
+INFO:FAIL - NTP time differs from local time
+INFO:FAIL - real time clock incorrect
+INFO:FAIL - tz offset: -4.000000000NTP set: False
+INFO:PASS - all self tests okay
+INFO:wdpass True, slotpass True,  spipass True, sdpass True, sht25pass True, rtcpass True, esppass True 
+INFO:PASSED all self tests
+INFO:Finished
+INFO:Started
+INFO:initializing...
+DEBUG:there are 1 com ports available
+DEBUG:/dev/ttyUSB2 - FT231X USB UART
+DEBUG:LINUX! there is an air quality egg on /dev/ttyUSB2
+DEBUG:Found AQE on /dev/ttyUSB2
+DEBUG:There were 1 eggs found.
+DEBUG:connected to port /dev/ttyUSB2
+INFO:reading header...
+INFO:wdpass True, slotpass True,  spipass True, sdpass True, sht25pass True, rtcpass True, esppass True 
+INFO:PASSED all self tests
+INFO:FAIL - tz offset: -4.000000000NTP set: False
+INFO:setting NTP time...
+INFO:restarting...
+DEBUG:debug: ntp test
+DEBUG:10:09:40
+DEBUG:10:10:08
+DEBUG:09
+DEBUG:10
+DEBUG:Debug!  time is within 5 mins of system time
+INFO:writing offline data...
+INFO:
+INFO:10/13/17
+INFO:10:10:16,25.66,39.65,555.0,0.0,---,---,---
+INFO:10/13/17
+INFO:10:11:16,25.63,38.70,558.1,---,---,---,---
+INFO:10/13/17
+INFO:10:12:16,25.53,37.76,561.6,---,---,---,---
+DEBUG:reconnecting to port /dev/ttyUSB2
+INFO:setting offline mode...
+INFO:restarting...
+INFO:writing offline data...
+INFO:
+INFO:10/13/17
+INFO:10:12:59,25.40,37.37,561.0,0.0,---,---,---
+INFO:10/13/17
+INFO:10:13:59,25.36,37.55,561.2,0.0,---,---,---
+INFO:10/13/17
+INFO:10:14:59,25.30,37.74,561.5,0.0,---,---,---
+INFO:restarting...
+DEBUG:reconnecting to port /dev/ttyUSB2
+INFO:reading files on SD card...
+DEBUG:Finished downloading...
+INFO:egg00804209689b0132
+INFO:
+INFO:
+INFO:PASS
+INFO:Firmware version 2.2.2
+INFO:PASS
+INFO:tz set to -4.000000000
+INFO:PASS - NTP time is correct
+INFO:PASS - real time clock set up and correct
+INFO:PASS - all self tests okay
+INFO:wdpass True, slotpass True,  spipass True, sdpass True, sht25pass True, rtcpass True, esppass True 
+INFO:PASSED all self tests
+INFO:Finished
 INFO:root:Started
 INFO:root:None
 INFO:root:Finished
 INFO:root:Started
-INFO:root:None
-INFO:root:Finished
+INFO:Started
+INFO:initializing...
+DEBUG:there are 1 com ports available
+DEBUG:/dev/ttyUSB1 - FT231X USB UART
+DEBUG:LINUX! there is an air quality egg on /dev/ttyUSB1
+DEBUG:Found AQE on /dev/ttyUSB1
+DEBUG:There were 1 eggs found.
+INFO:Started
+INFO:initializing...
+DEBUG:there are 1 com ports available
+DEBUG:/dev/ttyUSB1 - FT231X USB UART
+DEBUG:LINUX! there is an air quality egg on /dev/ttyUSB1
+DEBUG:Found AQE on /dev/ttyUSB1
+DEBUG:There were 1 eggs found.
+DEBUG:connected to port /dev/ttyUSB1
+INFO:reading header...
+INFO:wdpass True, slotpass True,  spipass True, sdpass True, sht25pass True, rtcpass True, esppass True 
+INFO:PASSED all self tests
+INFO:FAIL - tz offset: -4.000000000  NTP set: False
+INFO:setting NTP time...
+INFO:restarting...
+DEBUG:debug: ntp test
+DEBUG:11:18:35
+DEBUG:11:18:24
+DEBUG:18
+DEBUG:18
+DEBUG:Debug!  time is within 5 mins of system time
+INFO:writing offline data...
+INFO:
+INFO:10/13/17
+INFO:11:18:32,24.17,39.57,588.0,0.0,---,---,---
+INFO:10/13/17
+INFO:11:20:37,24.18,39.70,593.2,0.0,---,---,---
+DEBUG:reconnecting to port /dev/ttyUSB1
+INFO:setting offline mode...
+INFO:restarting...
+INFO:writing offline data...
+INFO:
+INFO:10/13/17
+INFO:11:21:20,24.22,39.53,591.0,0.0,---,---,---
+INFO:10/13/17
+INFO:11:22:20,24.21,39.61,590.6,---,---,---,---
+INFO:10/13/17
+INFO:11:23:20,24.23,39.66,597.2,---,---,---,---
+INFO:restarting...
+DEBUG:reconnecting to port /dev/ttyUSB1
+INFO:reading files on SD card...
+DEBUG:Finished downloading...
+INFO:egg0080425048990130
+INFO:
+INFO:
+INFO:PASS
+INFO:Firmware version 2.2.2
+INFO:PASS
+INFO:tz set to -4.000000000
+INFO:PASS - NTP time is correct
+INFO:PASS - real time clock set up and correct
+INFO:PASS - all self tests okay
+INFO:wdpass True, slotpass True,  spipass True, sdpass True, sht25pass True, rtcpass True, esppass True 
+INFO:PASSED all self tests
+INFO:Finished
+INFO:Started
+INFO:initializing...
+DEBUG:there are 1 com ports available
+DEBUG:/dev/ttyUSB0 - FT231X USB UART
+DEBUG:LINUX! there is an air quality egg on /dev/ttyUSB0
+DEBUG:Found AQE on /dev/ttyUSB0
+DEBUG:There were 1 eggs found.
+DEBUG:connected to port /dev/ttyUSB0
+INFO:reading header...
+INFO:wdpass True, slotpass True,  spipass True, sdpass True, sht25pass True, rtcpass True, esppass True 
+INFO:PASSED all self tests
+INFO:FAIL - tz offset: -4.000000000  NTP set: False
+INFO:setting NTP time...
+INFO:restarting...
+DEBUG:debug: ntp test
+DEBUG:12:14:47
+DEBUG:12:13:52
+DEBUG:14
+DEBUG:13
+DEBUG:Debug!  time is within 5 mins of system time
+INFO:writing offline data...
+INFO:
+INFO:10/13/17
+INFO:12:14:00,24.01,39.64,562.0,0.0,---,---,---
+INFO:10/13/17
+INFO:12:15:58,24.02,39.63,558.7,0.0,---,---,---
+DEBUG:reconnecting to port /dev/ttyUSB0
+INFO:setting offline mode...
+INFO:restarting...
+INFO:writing offline data...
+INFO:
+INFO:10/13/17
+INFO:12:16:41,24.04,39.71,554.0,0.0,---,---,---
+INFO:10/13/17
+INFO:12:17:41,24.05,39.75,561.0,0.0,---,---,---
+INFO:10/13/17
+INFO:12:18:41,24.04,39.88,570.3,0.0,---,---,---
+INFO:restarting...
+DEBUG:reconnecting to port /dev/ttyUSB0
+INFO:reading files on SD card...
+DEBUG:Finished downloading...
+INFO:egg0080425048990130
+INFO:
+INFO:
+INFO:PASS
+INFO:Firmware version 2.2.2
+INFO:PASS
+INFO:tz set to -4.000000000
+INFO:PASS - NTP time is correct
+INFO:PASS - real time clock set up and correct
+INFO:PASS - all self tests okay
+INFO:wdpass True, slotpass True,  spipass True, sdpass True, sht25pass True, rtcpass True, esppass True 
+INFO:PASSED all self tests
+INFO:Finished
 INFO:root:Started
-INFO:root:None
-INFO:root:Finished
-INFO:root:Started
-INFO:root:None
-INFO:root:Finished
-INFO:root:Started
-INFO:root:None
-INFO:root:Finished
-INFO:root:Started
-INFO:root:None
-INFO:root:Finished
-INFO:root:Started
-INFO:root:Started
-INFO:root:Started
-INFO:root:Started
-INFO:root:None
-INFO:root:Finished
-INFO:root:Started
-INFO:root:None
-INFO:root:Finished
-INFO:root:Started
-INFO:root:None
-INFO:root:Finished
-INFO:root:Started
-INFO:root:None
-INFO:root:Finished
-INFO:root:Started
-INFO:root:Started
-INFO:root:None
-INFO:root:Finished
 INFO:root:Started
