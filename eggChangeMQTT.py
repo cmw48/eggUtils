@@ -411,14 +411,21 @@ def main():
 from Tkinter import *
 class App:
   def __init__(self, master):
-    frame = Frame(master)
+
+    frame = Frame(master, height="105", width="155", bg="blue")
     frame.pack()
     self.button = Button(frame,
-                         text="QUIT", fg="red",
+                         text="QUIT",
+                         fg="red",
+                         height = 25, width = 30,
                          command=quit)
+
+
     self.button.pack(side=LEFT)
     self.slogan = Button(frame,
                          text="Hello",
+                         height = 25,
+                         width = 30,
                          command=self.write_slogan)
     self.slogan.pack(side=LEFT)
   def write_slogan(self):
