@@ -26,7 +26,7 @@ class App:
                              command=self.end_program)
         self.button.pack(side=LEFT)
         self.mode_default = Button(frame,
-                             text="set MQTT",
+                             text="set MQTT to\n" + host,
                              height=10, width=30, font=helv36,
                              command=self.run_program)
         self.mode_default.pack(side=LEFT)
@@ -512,6 +512,6 @@ def main():
 
 
 root = Tk()
-helv36 = tkFont.Font(family='Helvetica', size=12, weight='bold')
+helv36 = tkFont.Font(family='Helvetica', size=9, weight='bold')
 app = App(root)
 root.mainloop()
