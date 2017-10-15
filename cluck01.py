@@ -417,7 +417,7 @@ def setrtcwithntp(ser):
 
 
 def setmqttsrv(ser):
-    processcmd = cmd(ser, ['restore defaults\n', 'mqttsrv 192.168.1.31\n', 'backup all\n', 'ssid WickedDevice\n', 'pwd wildfire123\n', 'exit\n'])
+    processcmd = cmd(ser, ['restore defaults\n', 'mqttsrv ' + host + '\n', 'backup all\n', 'ssid WickedDevice\n', 'pwd wildfire123\n', 'exit\n'])
     #processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off -4\n', 'backup tz\n', 'ssid Acknet\n', 'pwd millicat75\n', 'exit\n'])
     time.sleep(4)
 
