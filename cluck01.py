@@ -6,6 +6,7 @@ import serial.tools.list_ports
 import traceback
 import logging
 from Tkinter import *
+import tkFont
 
 # declare once
 ser = serial.Serial()
@@ -13,7 +14,7 @@ ser = serial.Serial()
 fwver = '2.2.2'
 fwsig = '310547 40166'
 timezone = '-4.000000000'
-host = 'mqtt.opensensors.io'
+host = 'mqtt.wickeddevice.com'
 
 class App:
     def __init__(self, master):
@@ -21,16 +22,16 @@ class App:
         frame.pack()
         self.button = Button(frame,
                              text="QUIT", fg="red",
-                             height=10, width=30,
+                             height=10, width=30,  font=helv36,
                              command=self.end_program)
         self.button.pack(side=LEFT)
         self.mode_default = Button(frame,
                              text="set MQTT",
-                             height=10, width=30,
+                             height=10, width=30, font=helv36,
                              command=self.run_program)
         self.mode_default.pack(side=LEFT)
         self.mode_rtctest = Button(frame,
-                             text="RTC load",
+                             text="RTC load",  font=helv36,
                              height=10, width=30,
                              command=self.rtc_mode)
         self.mode_rtctest.pack(side=LEFT)
@@ -511,5 +512,6 @@ def main():
 
 
 root = Tk()
+helv36 = tkFont.Font(family='Helvetica', size=12, weight='bold')
 app = App(root)
 root.mainloop()
