@@ -15,6 +15,11 @@ fwver = '2.2.2'
 fwsig = '310547 40166'
 timezone = '-4.000000000'
 host = 'mqtt.wickeddevice.com'
+offlinemode = False
+datarowsread = 0
+ssid = "WickedDevice"
+pwd = "wildfire123"
+
 
 class App:
     def __init__(self, master):
@@ -25,26 +30,26 @@ class App:
                              height=10, width=30,  font=helv36,
                              command=self.end_program)
         self.button.pack(side=LEFT)
-        self.mode_default = Button(frame,
+        self.mode_mqtt = Button(frame,
                              text="set MQTT to\n" + host,
                              height=10, width=30, font=helv36,
                              command=self.run_program)
-        self.mode_default.pack(side=LEFT)
-        self.mode_rtctest = Button(frame,
+        self.mode_mqtt.pack(side=LEFT)
+        self.mode_setrtc = Button(frame,
                              text="RTC load",  font=helv36,
                              height=10, width=30,
                              command=self.rtc_mode)
-        self.mode_rtctest.pack(side=LEFT)
+        self.mode_setrtc.pack(side=LEFT)
 
     def run_program(self):
         print("setting mqttsrv!")
-        self.opmode = 'MQTT'
+        self.appmode = 'MQTT'
         if __name__ == "__main__":
             main()
 
     def rtc_mode(self):
         print("Running RTC mode!")
-        self.opmode = 'RTC'
+        self.appmode = 'RTC'
         if __name__ == "__main__":
             main()
 
@@ -81,8 +86,8 @@ class Egg:
         self.allpass = False
         self.dlfile = ''
         self.data = []
-
-
+        self.mqttconnack = False
+        self.wificonnack = False
 
     def introduce(self):
         print('eggserial {1}, eggtype {2}, firmware version {3}'.format(self, self.eggserial, self.eggtype, self.eggversion))
@@ -100,8 +105,9 @@ class Egg:
             rtcmsg = "PASS - "
         else:
             rtcmsg = "FAIL - "
-            rtcmsg = rtcmsg + "tz offset: " + str(self.tzoff) + "  NTP set: " + str(self.ntpok)
-            logging.info (rtcmsg)
+        rtcmsg = rtcmsg + "tz offset: " + str(self.tzoff) + "  NTP set: " + str(self.ntpok)
+        print(rtcmsg)
+        logging.info(rtcmsg)
 
     def finaltest(self):
         logging.info (self.eggserial)
@@ -139,7 +145,20 @@ class Egg:
         else:
             logging.info ('FAIL - self test failure, see below')
             allpass = False
-        self.passeggtests()
+
+        if self.wificonnack == True:
+            print('PASS - connected successfully to wifi')
+            logging.info('PASS - connected successfully to wifi')
+        else:
+            print('FAIL - did not connect to wifi')
+            logging.info('FAIL - did not connect to wifi')
+
+        if self.mqttconnack == True:
+            print('PASS - connected successfully to MQTT')
+            logging.info('PASS - connected successfully to MQTT')
+        else:
+            print('FAIL - did not connect to MQTT')
+            logging.info('FAIL - did not connect to MQTT')
 
         if (self.tempoff <> 0) and (self.humoff <> 0):
             print ('PASS - temp and humidity offsets are nonzero')
@@ -159,6 +178,7 @@ def parseEggData(thisEgg, words):
     numwords = len(words)
     csvdate = ''
     #print 'debug! number of words ' + str(numwords)
+
 
     if numwords > 3:
         try:
@@ -201,6 +221,22 @@ def parseEggData(thisEgg, words):
             elif words[1] == "SD":
                 if words[3]  == 'Initialization...OK.':
                     thisEgg.sdpass = True
+
+            elif words[1] == "Connecting":
+                if words[3] == "MQTT":
+                    if words[10]  == 'Authorization...OK.':
+                        thisEgg.mqttconnack = True
+                    else:
+                        thisEgg.mqttconnack = False
+                if words[3] == "Access":
+                    ssidconnect =  words[7]
+                    logging.information('Connected to ' + ssidconnect)
+                    if ssidconnect[-6:] == "...OK.":
+                        thisEgg.wificonnack = True
+                    else:
+                        thisEgg.wificonnack = False
+                    ssidname = ssidconnect[1:-7]
+                    print(ssidname)
 
             elif words[1] == "Getting":
                 if words[2] == "NTP":
@@ -267,12 +303,19 @@ def parseEggData(thisEgg, words):
 
             elif words[0] == "csv:":
                 # because this line is 3 words, it's a data row
-
                 #print 'debug: csv!'
                 rightnow = datetime.datetime.now()
                 csvdate = rightnow.strftime("%m/%d/%y")
                 print csvdate,
                 print str(words[2])
+                logging.info(csvdate + ' ' + str(words[2]))
+                datarowsread += 1
+                if datarowsread >= 3:
+                    return 'done'
+                    datarowsread = 0
+                else:
+                    pass
+
                 #TODO: need a pass fail condition
 
             elif str(words[2]) == csvdate:
@@ -309,8 +352,15 @@ def parseEggData(thisEgg, words):
                 print 'DEBUG! ' + str(lastfile) + ' files found'
             elif words[0] == "csv:":
                 # because this line is 2 words, it's a HEADER row
+                if offlinemode == False:
+                    print('publishing online mqtt data')
+                    logging.info('publishing online mqtt data')
+                else:
+                    print('writing offline data to SD')
+                    logging.info('writing offline data to SD')
                 print str(words)
-                print 'debug: header row!'
+                logging.info(str(words[1:]))
+
                 #rightnow = datetime.datetime.now()
                 #csvdate = rightnow.strftime("%m/%d/%y")
                 #print csvdate
@@ -424,12 +474,12 @@ def setmqttsrv(ser):
 
 def main():
 
-    logging.basicConfig(filename='eggtest.log', level=logging.INFO)
+    logging.basicConfig(filename='eggtest.log', level=logging.DEBUG)
 
-    logging.info('***Initialized - opmode ' + app.opmode + '***')
+    logging.info('***Initialized - appmode ' + app.appmode + '***')
 
 
-    print 'initializing opmode ' + app.opmode + '...'
+    print 'initializing appmode ' + app.appmode + '...'
     serPort = ""
     totalPorts = 0
     portcount = 0
@@ -493,14 +543,68 @@ def main():
     getsettings(ser)
     thisEgg.passeggtests()
 
-    if app.opmode == 'RTC':
+    if app.appmode == 'RTC':
         logging.info ("setting NTP time...")
+        # send RTC / NTP commands and reset
         setrtcwithntp(ser)
-    elif app.opmode == 'MQTT':
+        # verify rtc set
+
+        # restart
+        #  are there esp reload issues?
+          #Info: ESP8266 Firmware Version is up to date
+        #  watch for online data transmit via mqtt
+        # set opmode offline and exit
+        # verify offline data collection to sd card
+        # restart
+        # list files
+        # download files
+        # verify they look okay
+        # delete files from sd
+        # restore defaults, opmode offline, exit
+        readserial(ser, 90)
+        ser.close()  # In case the port is already open this closes it.
+        ser.open()   # Reopen the port.
+
+        logging.debug ("reconnecting to port " + eggComPort)
+        time.sleep(3)
+
+
+        logging.info('setting offline mode...')
+        processcmd = cmd(ser, ['aqe\n'])
+        time.sleep(4)
+        processcmd = cmd(ser, ['restore defaults\n'])
+        time.sleep(3)
+        processcmd = cmd(ser, ['opmode offline\n', 'exit\n'])
+        offlinemode = True
+        logging.info ("restarting...")
+        ser.close()  # In case the port is already open this closes it.
+        ser.open()   # Reopen the port.
+        readserial(ser, 40)
+        logging.info ("restarting...")
+        ser.close()  # In case the port is already open this closes it.
+        ser.open()   # Reopen the port.
+        logging.debug ("reconnecting to port " + eggComPort)
+        time.sleep(3)
+        logging.info ("reading files on SD card...")
+        processcmd = cmd(ser, ['aqe\n'])
+        time.sleep(4)
+        processcmd = cmd(ser, ['list files\n'])
+        readserial(ser, 100)
+        processcmd = cmd(ser, ['download ' + str(filelist[lastfile-1]) + '\n'])
+        readserial(ser, 100)
+        logging.debug ('Finished downloading...')
+        for filename in filelist:
+            processcmd = cmd(ser, ['delete ' + str(filename) + '\n'])
+            time.sleep(2)
+        logging.debug('deleted all csv files from SD...')
+        thisEgg.finaltest()
+
+
+    elif app.appmode == 'MQTT':
         logging.info ("setting mqttsrv...")
         setmqttsrv(ser)
     else:
-        print('Unknown opmode.')
+        print('Unknown appmode.')
 
 
 
