@@ -170,7 +170,7 @@ class Egg:
             print ('FAIL - temp and/or humidity offsets not entered')
             self.allpass = False
 
-        if self.dlfile = True:
+        if self.dlfile == True:
             print ('PASS - file download OK')
         else:
             print ('FAIL - failed to download files from the SD card')
