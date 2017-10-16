@@ -84,7 +84,7 @@ class Egg:
         self.tempoff = 0.0
         self.humoff = 0.0
         self.allpass = False
-        self.dlfile = ''
+        self.dlfile =  False
         self.data = []
         self.mqttconnack = False
         self.wificonnack = False
@@ -154,6 +154,7 @@ class Egg:
         else:
             print('FAIL - did not connect to wifi')
             logging.info('FAIL - did not connect to wifi')
+            self.allpass = False
 
         if self.mqttconnack == True:
             print('PASS - connected successfully to MQTT')
@@ -161,11 +162,19 @@ class Egg:
         else:
             print('FAIL - did not connect to MQTT')
             logging.info('FAIL - did not connect to MQTT')
+            self.allpass = False
 
         if (self.tempoff <> 0.0) and (self.humoff <> 0.0):
             print ('PASS - temp and humidity offsets are nonzero')
         else:
             print ('FAIL - temp and/or humidity offsets not entered')
+            self.allpass = False
+
+        if self.dlfile = True:
+            print ('PASS - file download OK')
+        else:
+            print ('FAIL - failed to download files from the SD card')
+            self.allpass = False
 
         if self.allpass == True:
             print ('PASS - egg passes all tests.  Ready to pack')
@@ -501,25 +510,28 @@ def clearsd(ser):
         processcmd = cmd(ser, ['list files\n'])
         readserial(ser, 200)
         print(thisEgg.filelist)
-        print('DEBUG! Here is the whole filelist!')
-        for filename in thisEgg.filelist:
-            if filename[:1] == "7":
-                print(filename)
-                processcmd = cmd(ser, ['delete ' + str(filename) + '\n'])
-            else:
-                batchlist.append(filename)
-                print('DEBUG! appended to batchlist!')
-
-        print('DEBUG! Here is the whole batchlist!' + str(batchlist))
-
-        numberoffiles = len(batchlist)
-        if numberoffiles > 1:
-            deletelist = sorted(batchlist)
-            print('DEBUG! Here is the whole delete list!' + str(deletelist))
-            processcmd = cmd(ser, ['delete ' + str(deletelist[0])[:8] + ' ' + str(deletelist[-1])[:8] + '\n'])
+        if len(thisEgg.filelist) == 0:
+            print('No files to delete!')
         else:
-            print('DEBUG! - single file delete')
-            processcmd = cmd(ser, ['delete ' + str(batchlist[0]) + '\n'])
+            print('DEBUG! Here is the whole filelist!')
+            for filename in thisEgg.filelist:
+                if filename[:1] == "7":
+                    print(filename)
+                    processcmd = cmd(ser, ['delete ' + str(filename) + '\n'])
+                else:
+                    batchlist.append(filename)
+                    print('DEBUG! appended to batchlist!')
+
+            print('DEBUG! Here is the whole batchlist!' + str(batchlist))
+
+            numberoffiles = len(batchlist)
+            if numberoffiles > 1:
+                deletelist = sorted(batchlist)
+                print('DEBUG! Here is the whole delete list!' + str(deletelist))
+                processcmd = cmd(ser, ['delete ' + str(deletelist[0])[:8] + ' ' + str(deletelist[-1])[:8] + '\n'])
+            else:
+                print('DEBUG! - single file delete')
+                processcmd = cmd(ser, ['delete ' + str(batchlist[0]) + '\n'])
 
 
         time.sleep(2)
@@ -647,9 +659,17 @@ def main():
         thisEgg.filelist = []
         processcmd = cmd(ser, ['list files\n'])
         readserial(ser, 97)
-        processcmd = cmd(ser, ['download ' + str(thisEgg.filelist[lastfile]) + '\n'])
-        readserial(ser, 100)
-        logging.debug ('Finished downloading...')
+        if len(thisEgg.filelist) == 0:
+            print('No files to download.  FAIL')
+            logging.info('No files to download.  FAIL')
+            thisEgg.dlfile = False
+        else:
+            processcmd = cmd(ser, ['download ' + str(thisEgg.filelist[lastfile]) + '\n'])
+            print('No files to download.  FAIL')
+            logging.info('No files to download.  FAIL')
+            readserial(ser, 100)
+            logging.debug ('Finished downloading...')
+            thisEgg.dlfile = True
         clearsd(ser)
         logging.debug('deleted all csv files from SD...')
         thisEgg.finaltest()
