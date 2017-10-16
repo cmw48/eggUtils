@@ -64,7 +64,7 @@ class Egg:
         logging.info (self.macaddr)
         logging.info (self.mqtthost)
         allpass = True
-        if self.eggversion == '2.2.2':
+        if self.eggversion == fwver:
             logging.info ('PASS',)
         else:
             logging.error ('FAIL',)
@@ -260,7 +260,7 @@ def parseEggData(thisEgg, words):
             elif words[0] == "csv:":
                 logging.info ('writing offline data...')
                 # because this line is 2 words, it's a HEADER row
-                #logging.info (str(words))
+                logging.info (str(words[2:]))
                 print 'debug: header row!'
                 #rightnow = datetime.datetime.now()
                 #csvdate = rightnow.strftime("%m/%d/%y")
@@ -460,8 +460,11 @@ def main():
         processcmd = cmd(ser, ['download ' + str(filelist[lastfile-1]) + '\n'])
         readserial(ser, 100)
         logging.debug ('Finished downloading...')
+        processcmd = cmd(ser, ['download ' + str(filelist[lastfile]) + '\n'])
         thisEgg.finaltest()
-
+        for csvfilename in filelist:
+            processcmd = cmd(ser, ['delete ' + csvfilename + '\n'])
+            time.sleep(2)
         logging.info('Finished')
 
         again = raw_input("press any key to test another egg... ")
