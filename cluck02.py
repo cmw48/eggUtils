@@ -162,7 +162,7 @@ class Egg:
             print('FAIL - did not connect to MQTT')
             logging.info('FAIL - did not connect to MQTT')
 
-        if (self.tempoff <> 0) and (self.humoff <> 0):
+        if (self.tempoff <> 0.0) and (self.humoff <> 0.0):
             print ('PASS - temp and humidity offsets are nonzero')
         else:
             print ('FAIL - temp and/or humidity offsets not entered')
@@ -287,10 +287,10 @@ def parseEggData(thisEgg, words):
                     thisEgg.mqtthost = words[2]
 
             elif words[0] == "Temperature":
-                thisEgg.tempoff = words[4]
+                thisEgg.tempoff = float(words[4])
 
             elif words[0] == "Humidity":
-                thisEgg.humoff = words[4]
+                thisEgg.humoff = float(words[4])
 
             else:
                 # don't set any eggvars
