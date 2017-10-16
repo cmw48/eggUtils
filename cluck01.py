@@ -484,6 +484,16 @@ def setmqttsrv(ser):
     #processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off -4\n', 'backup tz\n', 'ssid Acknet\n', 'pwd millicat75\n', 'exit\n'])
     time.sleep(4)
 
+def clearsd(ser):
+        logging.info ("reading files on SD card...")
+        processcmd = cmd(ser, ['list files\n'])
+        readserial(ser, 97)
+        for filename in filelist:
+            processcmd = cmd(ser, ['delete ' + str(filename) + '\n'])
+            time.sleep(2)
+        logging.debug('deleted all csv files from SD...')
+
+
 def main():
 
     logging.basicConfig(filename='eggtest.log', level=logging.DEBUG)
@@ -583,7 +593,9 @@ def main():
 
         logging.info('setting offline mode...')
         processcmd = cmd(ser, ['aqe\n'])
-        time.sleep(4)
+        time.sleep(2)
+        clearsd(ser)
+        time.sleep(2)
         processcmd = cmd(ser, ['restore defaults\n'])
         time.sleep(3)
         processcmd = cmd(ser, ['opmode offline\n', 'exit\n'])

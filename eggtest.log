@@ -1,0 +1,150 @@
+INFO:root:*************************
+INFO:root:***Initialized - appmode RTC***
+INFO:root:eggserial egg00804222101b0123, eggtype CO2, firmware version 2.2.2
+INFO:root:wdpass True, slotpass True,  spipass True, sdpass True, sht25pass True, rtcpass True, esppass True 
+INFO:root:PASSED all self tests
+INFO:root:setting NTP time...
+INFO:root:FAIL - tz offset: -4.000000000  NTP set: False
+INFO:root:restarting...
+INFO:root:Connected to "WickedDevice"...OK.
+DEBUG:root:debug: ntp test
+DEBUG:root:14:03:31
+DEBUG:root:14:02:40
+DEBUG:root:03
+DEBUG:root:02
+DEBUG:root:Debug!  time is within 5 mins of system time
+INFO:root:PASS - tz offset: -4.000000000  NTP set: True
+INFO:root:publishing online mqtt data
+INFO:root:['Timestamp,Temperature[degC],Humidity[percent],CO2[ppm],Pressure[Pa],Latitude[deg],Longitude[deg],Altitude[m]']
+INFO:root:10/16/17 14:02:48,26.58,32.38,598.0,0.0,---,---,---
+DEBUG:root:reconnecting to port COM233
+INFO:root:setting offline mode...
+INFO:root:restarting...
+INFO:root:writing offline data to SD
+INFO:root:['Timestamp,Temperature[degC],Humidity[percent],CO2[ppm],Pressure[Pa],Latitude[deg],Longitude[deg],Altitude[m]']
+INFO:root:10/16/17 14:03:42,26.58,32.23,619.0,0.0,---,---,---
+INFO:root:10/16/17 14:04:42,26.60,32.17,619.7,---,---,---,---
+INFO:root:restarting...
+DEBUG:root:reconnecting to port COM233
+INFO:root:reading files on SD card...
+DEBUG:root:Finished downloading...
+DEBUG:root:deleted all csv files from SD...
+INFO:root:egg00804222101b0123
+INFO:root:
+INFO:root:
+INFO:root:PASS
+INFO:root:Firmware version 2.2.2
+INFO:root:PASS
+INFO:root:tz set to -4.000000000
+INFO:root:PASS - NTP time is correct
+INFO:root:PASS - real time clock set up and correct
+INFO:root:PASS - tz offset: -4.000000000  NTP set: True
+INFO:root:PASS - all self tests okay
+INFO:root:PASS - connected successfully to wifi
+INFO:root:PASS - connected successfully to MQTT
+INFO:root:PASS - egg passes all tests.  Ready to pack
+INFO:root:***************************************
+INFO:root: 
+INFO:root: 
+INFO:root:*************************
+INFO:root:***Initialized - appmode RTC***
+INFO:root:eggserial egg008042f921080120, eggtype CO2, firmware version 2.2.2
+INFO:root:wdpass True, slotpass True,  spipass True, sdpass True, sht25pass True, rtcpass True, esppass True 
+INFO:root:PASSED all self tests
+INFO:root:setting NTP time...
+INFO:root:PASS - tz offset: -4.000000000  NTP set: True
+INFO:root:restarting...
+INFO:root:Connected to "WickedDevice"...OK.
+DEBUG:root:debug: ntp test
+DEBUG:root:14:07:44
+DEBUG:root:14:06:56
+DEBUG:root:07
+DEBUG:root:06
+DEBUG:root:Debug!  time is within 5 mins of system time
+INFO:root:PASS - tz offset: -4.000000000  NTP set: True
+INFO:root:writing offline data to SD
+INFO:root:['Timestamp,Temperature[degC],Humidity[percent],CO2[ppm],Pressure[Pa],Latitude[deg],Longitude[deg],Altitude[m]']
+INFO:root:10/16/17 14:07:04,25.60,30.76,633.0,0.0,---,---,---
+DEBUG:root:reconnecting to port COM233
+INFO:root:setting offline mode...
+INFO:root:restarting...
+INFO:root:writing offline data to SD
+INFO:root:['Timestamp,Temperature[degC],Humidity[percent],CO2[ppm],Pressure[Pa],Latitude[deg],Longitude[deg],Altitude[m]']
+INFO:root:10/16/17 14:07:48,25.58,31.16,643.0,0.0,---,---,---
+INFO:root:restarting...
+DEBUG:root:reconnecting to port COM233
+INFO:root:reading files on SD card...
+DEBUG:root:Finished downloading...
+DEBUG:root:deleted all csv files from SD...
+INFO:root:egg008042f921080120
+INFO:root:
+INFO:root:
+INFO:root:PASS
+INFO:root:Firmware version 2.2.2
+INFO:root:PASS
+INFO:root:tz set to -4.000000000
+INFO:root:PASS - NTP time is correct
+INFO:root:PASS - real time clock set up and correct
+INFO:root:PASS - tz offset: -4.000000000  NTP set: True
+INFO:root:PASS - all self tests okay
+INFO:root:PASS - connected successfully to wifi
+INFO:root:PASS - connected successfully to MQTT
+INFO:root:PASS - egg passes all tests.  Ready to pack
+INFO:root:***************************************
+INFO:root: 
+INFO:root: 
+INFO:root:*************************
+INFO:root:***Initialized - appmode RTC***
+INFO:root:eggserial egg00804266f30b0122, eggtype CO2, firmware version 2.2.2
+INFO:root:wdpass True, slotpass True,  spipass True, sdpass True, sht25pass True, rtcpass False, esppass True 
+INFO:root:setting NTP time...
+INFO:root:FAIL - tz offset: 0.000000000  NTP set: False
+INFO:root:restarting...
+INFO:root:Connected to "WickedDevice"...OK.
+DEBUG:root:debug: ntp test
+DEBUG:root:14:12:07
+DEBUG:root:14:11:12
+DEBUG:root:12
+DEBUG:root:11
+DEBUG:root:Debug!  time is within 5 mins of system time
+INFO:root:PASS - tz offset: 0.000000000  NTP set: True
+INFO:root:publishing online mqtt data
+INFO:root:['Timestamp,Temperature[degC],Humidity[percent],CO2[ppm],Pressure[Pa],Latitude[deg],Longitude[deg],Altitude[m]']
+INFO:root:10/16/17 14:11:20,23.89,31.67,620.0,0.0,---,---,---
+DEBUG:root:reconnecting to port COM233
+INFO:root:setting offline mode...
+INFO:root:restarting...
+INFO:root:writing offline data to SD
+INFO:root:['Timestamp,Temperature[degC],Humidity[percent],CO2[ppm],Pressure[Pa],Latitude[deg],Longitude[deg],Altitude[m]']
+INFO:root:10/16/17 14:12:04,24.05,31.22,610.0,0.0,---,---,---
+INFO:root:10/16/17 14:13:04,24.15,31.01,603.0,---,---,---,---
+INFO:root:restarting...
+DEBUG:root:reconnecting to port COM233
+INFO:root:reading files on SD card...
+DEBUG:root:Finished downloading...
+DEBUG:root:deleted all csv files from SD...
+INFO:root:egg00804266f30b0122
+INFO:root:
+INFO:root:
+INFO:root:PASS
+INFO:root:Firmware version 2.2.2
+INFO:root:PASS
+INFO:root:tz set to -4.000000000
+INFO:root:PASS - NTP time is correct
+INFO:root:PASS - real time clock set up and correct
+INFO:root:PASS - tz offset: -4.000000000  NTP set: True
+INFO:root:PASS - all self tests okay
+INFO:root:PASS - connected successfully to wifi
+INFO:root:PASS - connected successfully to MQTT
+INFO:root:PASS - egg passes all tests.  Ready to pack
+INFO:root:***************************************
+INFO:root: 
+INFO:root: 
+INFO:root:*************************
+INFO:root:***Initialized - appmode RTC***
+INFO:root:eggserial egg00804266f30b0122, eggtype CO2, firmware version 2.2.2
+INFO:root:wdpass True, slotpass True,  spipass True, sdpass True, sht25pass True, rtcpass True, esppass True 
+INFO:root:PASSED all self tests
+INFO:root:setting NTP time...
+INFO:root:FAIL - tz offset: -4.000000000  NTP set: False
+INFO:root:restarting...
