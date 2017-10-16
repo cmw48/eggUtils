@@ -88,6 +88,7 @@ class Egg:
         self.data = []
         self.mqttconnack = False
         self.wificonnack = False
+        self.filelist = []
 
     def introduce(self):
         print('eggserial {1}, eggtype {2}, firmware version {3}'.format(self, self.eggserial, self.eggtype, self.eggversion))
@@ -174,7 +175,7 @@ class Egg:
             logging.info  ('FAIL - egg failed at least one test above.  Try running tests again.')
 
 thisEgg = Egg()
-filelist = []
+
 lastfile = 0
 
 
@@ -184,6 +185,7 @@ def parseEggData(thisEgg, words):
     csvdate = ''
     global datarowsread
     global offlinemode
+    filelist = []
     #print 'debug! number of words ' + str(numwords)
 
 
@@ -393,6 +395,7 @@ def parseEggData(thisEgg, words):
         except:
             print sys.exc_info()[0]
             print traceback.format_exc()
+    thisEgg.filelist = filelist
 
 def readserial(ser, numlines):
     parsereturn = ''
@@ -485,12 +488,22 @@ def setmqttsrv(ser):
     time.sleep(4)
 
 def clearsd(ser):
+        batchlist = []
         logging.info ("reading files on SD card...")
         processcmd = cmd(ser, ['list files\n'])
         readserial(ser, 97)
-        for filename in filelist:
-            processcmd = cmd(ser, ['delete ' + str(filename) + '\n'])
-            time.sleep(2)
+        for filename in thisEgg.filelist:
+            if filename[:1] == "7":
+                print(filename)
+                processcmd = cmd(ser, ['delete ' + str(filename) + '\n'])
+            else:
+                if len(thisEgg.filelist) == 1:
+                    processcmd = cmd(ser, ['delete ' + str(filename) + '\n'])
+                else:
+                    batchlist.append(filename)
+                    deletelist = sorted(batchlist)
+                    processcmd = cmd(ser, ['delete ' + str(deletelist[0])[:8] + ' ' + str(deletelist[-1])[:8] + '\n'])
+        time.sleep(5)
         logging.debug('deleted all csv files from SD...')
 
 
@@ -614,10 +627,10 @@ def main():
         time.sleep(4)
         processcmd = cmd(ser, ['list files\n'])
         readserial(ser, 97)
-        processcmd = cmd(ser, ['download ' + str(filelist[lastfile-1]) + '\n'])
+        processcmd = cmd(ser, ['download ' + str(thisEgg.filelist[lastfile]) + '\n'])
         readserial(ser, 100)
         logging.debug ('Finished downloading...')
-        for filename in filelist:
+        for filename in thisEgg.filelist:
             processcmd = cmd(ser, ['delete ' + str(filename) + '\n'])
             time.sleep(2)
         logging.debug('deleted all csv files from SD...')
