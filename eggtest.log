@@ -142,3 +142,121 @@ DEBUG:root:56
 DEBUG:root:54
 DEBUG:root:Debug!  time is within 5 mins of system time
 INFO:root:PASS - tz offset: -4.000000000  NTP set: True
+INFO:root:***Initialized - appmode RTC***
+INFO:root:wdpass True, slotpass True,  spipass True, sdpass True, sht25pass True, rtcpass True, esppass True 
+INFO:root:PASSED all self tests
+INFO:root:setting NTP time...
+INFO:root:FAIL - tz offset: -4.000000000  NTP set: False
+INFO:root:restarting...
+DEBUG:root:debug: ntp test
+DEBUG:root:19:11:38
+DEBUG:root:19:12:00
+DEBUG:root:11
+DEBUG:root:12
+DEBUG:root:Debug!  time is within 5 mins of system time
+INFO:root:PASS - tz offset: -4.000000000  NTP set: True
+INFO:root:publishing online mqtt data
+INFO:root:['Timestamp,Temperature[degC],Humidity[percent],CO2[ppm],Pressure[Pa],Latitude[deg],Longitude[deg],Altitude[m]']
+INFO:root:10/15/17 19:12:08,27.24,49.08,498.0,0.0,---,---,---
+INFO:root:10/15/17 19:13:08,27.22,49.61,519.4,---,---,---,---
+DEBUG:root:debug: ntp test
+DEBUG:root:19:14:02
+DEBUG:root:19:12:00
+DEBUG:root:14
+DEBUG:root:12
+DEBUG:root:Debug!  time is within 5 mins of system time
+INFO:root:PASS - tz offset: -4.000000000  NTP set: True
+INFO:root:publishing online mqtt data
+INFO:root:['Timestamp,Temperature[degC],Humidity[percent],CO2[ppm],Pressure[Pa],Latitude[deg],Longitude[deg],Altitude[m]']
+INFO:root:10/15/17 19:12:08,27.24,49.28,501.0,0.0,---,---,---
+INFO:root:10/15/17 19:14:07,27.25,49.21,495.7,0.0,---,---,---
+INFO:root:10/15/17 19:15:06,27.25,49.33,507.0,---,---,---,---
+INFO:root:10/15/17 19:16:07,27.25,49.31,505.4,0.0,---,---,---
+DEBUG:root:reconnecting to port COM233
+INFO:root:setting offline mode...
+INFO:root:restarting...
+INFO:root:publishing online mqtt data
+INFO:root:['Timestamp,Temperature[degC],Humidity[percent],CO2[ppm],Pressure[Pa],Latitude[deg],Longitude[deg],Altitude[m]']
+INFO:root:10/15/17 19:17:01,27.22,49.35,497.0,0.0,---,---,---
+INFO:root:10/15/17 19:18:01,27.20,49.15,496.2,0.0,---,---,---
+INFO:root:10/15/17 19:19:01,27.17,49.03,486.5,0.0,---,---,---
+INFO:root:restarting...
+DEBUG:root:reconnecting to port COM233
+INFO:root:reading files on SD card...
+DEBUG:root:Finished downloading...
+DEBUG:root:deleted all csv files from SD...
+INFO:root:egg008042e0b4980121
+INFO:root:
+INFO:root:
+INFO:root:PASS
+INFO:root:Firmware version 2.2.2
+INFO:root:PASS
+INFO:root:tz set to -4.000000000
+INFO:root:PASS - NTP time is correct
+INFO:root:PASS - real time clock set up and correct
+INFO:root:PASS - tz offset: -4.000000000  NTP set: True
+INFO:root:PASS - all self tests okay
+INFO:root:FAIL - did not connect to wifi
+INFO:root:FAIL - did not connect to MQTT
+INFO:root:***Initialized - appmode RTC***
+INFO:root:eggserial egg008042e0b4980121, eggtype CO2, firmware version 2.2.2
+INFO:root:wdpass True, slotpass True,  spipass True, sdpass True, sht25pass True, rtcpass True, esppass True 
+INFO:root:PASSED all self tests
+INFO:root:setting NTP time...
+INFO:root:FAIL - tz offset: -4.000000000  NTP set: False
+INFO:root:restarting...
+DEBUG:root:debug: ntp test
+DEBUG:root:19:27:14
+DEBUG:root:19:29:04
+DEBUG:root:27
+DEBUG:root:29
+DEBUG:root:Debug!  time is within 5 mins of system time
+INFO:root:PASS - tz offset: -4.000000000  NTP set: True
+INFO:root:publishing online mqtt data
+INFO:root:['Timestamp,Temperature[degC],Humidity[percent],CO2[ppm],Pressure[Pa],Latitude[deg],Longitude[deg],Altitude[m]']
+INFO:root:10/15/17 19:29:12,27.20,48.55,483.0,0.0,---,---,---
+DEBUG:root:debug: ntp test
+DEBUG:root:19:30:16
+DEBUG:root:19:29:04
+DEBUG:root:30
+DEBUG:root:29
+DEBUG:root:Debug!  time is within 5 mins of system time
+INFO:root:PASS - tz offset: -4.000000000  NTP set: True
+INFO:root:publishing online mqtt data
+INFO:root:['Timestamp,Temperature[degC],Humidity[percent],CO2[ppm],Pressure[Pa],Latitude[deg],Longitude[deg],Altitude[m]']
+INFO:root:10/15/17 19:29:12,27.13,50.39,538.0,0.0,---,---,---
+INFO:root:10/15/17 19:31:10,27.13,50.47,536.5,0.0,---,---,---
+DEBUG:root:reconnecting to port COM233
+INFO:root:setting offline mode...
+INFO:root:restarting...
+INFO:root:publishing online mqtt data
+INFO:root:['Timestamp,Temperature[degC],Humidity[percent],CO2[ppm],Pressure[Pa],Latitude[deg],Longitude[deg],Altitude[m]']
+INFO:root:10/15/17 19:31:53,27.11,49.92,511.0,0.0,---,---,---
+INFO:root:restarting...
+DEBUG:root:reconnecting to port COM233
+INFO:root:reading files on SD card...
+DEBUG:root:Finished downloading...
+DEBUG:root:deleted all csv files from SD...
+INFO:root:egg008042e0b4980121
+INFO:root:
+INFO:root:
+INFO:root:PASS
+INFO:root:Firmware version 2.2.2
+INFO:root:PASS
+INFO:root:tz set to -4.000000000
+INFO:root:PASS - NTP time is correct
+INFO:root:PASS - real time clock set up and correct
+INFO:root:PASS - tz offset: -4.000000000  NTP set: True
+INFO:root:PASS - all self tests okay
+INFO:root:FAIL - did not connect to wifi
+INFO:root:FAIL - did not connect to MQTT
+INFO:root:***Initialized - appmode MQTT***
+INFO:root:eggserial egg00802294f10b0142, eggtype NO2CO, firmware version 2.2.1
+INFO:root:wdpass True, slotpass True,  spipass True, sdpass True, sht25pass True, rtcpass True, esppass True 
+INFO:root:PASSED all self tests
+INFO:root:setting mqttsrv...
+INFO:root:***Initialized - appmode MQTT***
+INFO:root:eggserial egg00802ebee29b0120, eggtype CO2, firmware version 2.2.2
+INFO:root:wdpass True, slotpass True,  spipass True, sdpass True, sht25pass True, rtcpass True, esppass True 
+INFO:root:PASSED all self tests
+INFO:root:setting mqttsrv...

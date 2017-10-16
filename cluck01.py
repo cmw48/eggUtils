@@ -91,6 +91,7 @@ class Egg:
 
     def introduce(self):
         print('eggserial {1}, eggtype {2}, firmware version {3}'.format(self, self.eggserial, self.eggtype, self.eggversion))
+        logging.info('eggserial {1}, eggtype {2}, firmware version {3}'.format(self, self.eggserial, self.eggtype, self.eggversion))
 
     def passeggtests(self):
         print('wdpass {1}, slotpass {2},  spipass {3}, sdpass {4}, sht25pass {5}, rtcpass {6}, esppass {7} '.format(self, self.wdpass, self.slotpass, self.spipass, self.sdpass, self.sht25pass, self.rtcpass, self.esppass))
@@ -168,15 +169,13 @@ class Egg:
 thisEgg = Egg()
 filelist = []
 lastfile = 0
-#myegg = Egg("egg0080huey")
-#otheregg = Egg("egg0080louie")
-#myegg.introduce()
-#otheregg.introduce()
+
 
 def parseEggData(thisEgg, words):
     ignoreline = False
     numwords = len(words)
     csvdate = ''
+    global datarowsread
     #print 'debug! number of words ' + str(numwords)
 
 
@@ -426,7 +425,7 @@ def getconfigmode(ser):
     time.sleep(4)
     #get just enough of header to determine egg type
     readserial(ser, 6)
-    #thisEgg.introduce()
+    thisEgg.introduce()
     if thisEgg.eggtype == 'CO2':
         #immediately read 10 more lines
         readserial(ser, 10)
