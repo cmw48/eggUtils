@@ -415,7 +415,7 @@ def readserial(ser, numlines):
             print 'Debug! just got done with ESP8266 update, restart and redo ntp'
         elif parsereturn == 'blank':
             blankcount = blankcount + 1
-            if blankcount > 7:
+            if blankcount > 3:
                 print('Debug! too many blank lines')
                 readmore = False
             else:
