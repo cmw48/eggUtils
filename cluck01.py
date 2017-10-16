@@ -358,9 +358,9 @@ def parseEggData(thisEgg, words):
             if filenameext == ".csv":
                 filename = filenametest
                 filedate = filenametest[:8]
-                filelist.append(filename)
+                thisEgg.filelist.append(filename)
                 thisEgg.downloadok = True
-                lastfile = len(filelist)
+                lastfile = len(thisEgg.filelist)
                 print 'DEBUG! ' + filename + " , " + filedate
                 print 'DEBUG! ' + str(filelist)
                 print 'DEBUG! ' + str(lastfile) + ' files found'
@@ -388,17 +388,18 @@ def parseEggData(thisEgg, words):
             print sys.exc_info()[0]
             print traceback.format_exc()
 
-    elif numwords <= 1:
+    elif numwords == 0:
         try:
-            return 'suppress'
+            return 'blank'
 
         except:
             print sys.exc_info()[0]
             print traceback.format_exc()
-    thisEgg.filelist = filelist
+
 
 def readserial(ser, numlines):
     parsereturn = ''
+    blankcount = 0
     readcount = 0
     readmore = True
     while readmore:
@@ -411,12 +412,16 @@ def readserial(ser, numlines):
             readmore = False
         elif parsereturn == 'espupd':
             print 'Debug! just got done with ESP8266 update, restart and redo ntp'
-        #print rcv1
-        #print '(' + str(readcount) + ') ' + str(words)
-        #elif parsereturn == 'suppress':
-        #   print '.',
+        elif parsereturn == 'blank':
+            blankcount = blankcount + 1
+            if blankcount > 7:
+                print('Debug! too many blank lines')
+                readmore = False
+            else:
+                print('Debug! = blank line ' + str(blankcount))
+
         else:
-            print '(' + str(readcount) + ') ' + rcv1
+            print('(' + str(readcount) + ') ' + rcv1 + ' ' + str(numlines))
         readcount = readcount + 1
         if (readcount > numlines):
             readcount = 0
@@ -428,7 +433,7 @@ def cmd (ser, cmdlist):
     for cmd in cmdlist:
         ser.write(cmd)
         print cmd
-        time.sleep(3)
+        time.sleep(2)
     return 'command list processed...'
 
 
@@ -469,7 +474,7 @@ def getsettings(ser):
 
     # gas egg displays 99 lines after AQE
     #readserial(ser, 99)
-    time.sleep(3)
+    time.sleep(2)
 
 def setrtcwithntp(ser):
     processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off -4\n', 'backup tz\n', 'ssid WickedDevice\n', 'pwd wildfire123\n', 'exit\n'])
@@ -490,20 +495,30 @@ def setmqttsrv(ser):
 def clearsd(ser):
         batchlist = []
         logging.info ("reading files on SD card...")
+        thisEgg.filelist = []
         processcmd = cmd(ser, ['list files\n'])
-        readserial(ser, 97)
+        readserial(ser, 200)
+        print(thisEgg.filelist)
+        print('DEBUG! Here is the whole filelist!')
         for filename in thisEgg.filelist:
             if filename[:1] == "7":
                 print(filename)
                 processcmd = cmd(ser, ['delete ' + str(filename) + '\n'])
             else:
-                if len(thisEgg.filelist) == 1:
-                    processcmd = cmd(ser, ['delete ' + str(filename) + '\n'])
-                else:
-                    batchlist.append(filename)
-                    deletelist = sorted(batchlist)
-                    processcmd = cmd(ser, ['delete ' + str(deletelist[0])[:8] + ' ' + str(deletelist[-1])[:8] + '\n'])
-        time.sleep(5)
+                batchlist.append(filename)
+                print('DEBUG! appended to batchlist!')
+
+        print('DEBUG! Here is the whole batchlist!' + str(batchlist))
+
+        numberoffiles = len(batchlist)
+        if numberoffiles > 1:
+            deletelist = sorted(batchlist)
+            print('DEBUG! Here is the whole delete list!' + str(deletelist))
+            processcmd = cmd(ser, ['delete ' + str(deletelist[0])[:8] + ' ' + str(deletelist[-1])[:8] + '\n'])
+        else:
+            processcmd = cmd(ser, ['delete ' + str(batchlist[0]) + '\n'])
+
+        time.sleep(2)
         logging.debug('deleted all csv files from SD...')
 
 
@@ -625,6 +640,7 @@ def main():
         logging.info ("reading files on SD card...")
         processcmd = cmd(ser, ['aqe\n'])
         time.sleep(4)
+        thisEgg.filelist = []
         processcmd = cmd(ser, ['list files\n'])
         readserial(ser, 97)
         processcmd = cmd(ser, ['download ' + str(thisEgg.filelist[lastfile]) + '\n'])
