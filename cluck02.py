@@ -409,6 +409,7 @@ def readserial(ser, numlines):
         parsereturn = parseEggData(thisEgg, words)
         if parsereturn == 'done':
             print 'Debug! early terminate for readlines'
+            blankcount = 0
             readmore = False
         elif parsereturn == 'espupd':
             print 'Debug! just got done with ESP8266 update, restart and redo ntp'
@@ -422,6 +423,7 @@ def readserial(ser, numlines):
 
         else:
             print('(' + str(readcount) + ') ' + rcv1 + ' ' + str(numlines))
+            blankcount = 0
         readcount = readcount + 1
         if (readcount > numlines):
             readcount = 0
@@ -516,7 +518,9 @@ def clearsd(ser):
             print('DEBUG! Here is the whole delete list!' + str(deletelist))
             processcmd = cmd(ser, ['delete ' + str(deletelist[0])[:8] + ' ' + str(deletelist[-1])[:8] + '\n'])
         else:
+            print('DEBUG! - single file delete')
             processcmd = cmd(ser, ['delete ' + str(batchlist[0]) + '\n'])
+
 
         time.sleep(2)
         logging.debug('deleted all csv files from SD...')
@@ -646,9 +650,7 @@ def main():
         processcmd = cmd(ser, ['download ' + str(thisEgg.filelist[lastfile]) + '\n'])
         readserial(ser, 100)
         logging.debug ('Finished downloading...')
-        for filename in thisEgg.filelist:
-            processcmd = cmd(ser, ['delete ' + str(filename) + '\n'])
-            time.sleep(2)
+        clearsd(ser)
         logging.debug('deleted all csv files from SD...')
         thisEgg.finaltest()
         logging.info('***************************************')
