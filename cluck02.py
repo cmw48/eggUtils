@@ -17,8 +17,8 @@ timezone = '-4.000000000'
 host = 'mqtt.wickeddevice.com'
 offlinemode = False
 datarowsread = 0
-ssid = "WickedDevice"
-pwd = "wildfire123"
+ssidstring = "Acknet"
+ssidpwd = "millicat75"
 
 
 class App:
@@ -488,7 +488,7 @@ def getsettings(ser):
     time.sleep(2)
 
 def setrtcwithntp(ser):
-    processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off -4\n', 'backup tz\n', 'ssid WickedDevice\n', 'pwd wildfire123\n', 'exit\n'])
+    processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off -4\n', 'backup tz\n', 'ssid '+ ssidstring +'\n', 'pwd '+ ssidpwd +'\n', 'exit\n'])
     #processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off -4\n', 'backup tz\n', 'ssid Acknet\n', 'pwd millicat75\n', 'exit\n'])
     time.sleep(2)
     thisEgg.rtctest()
@@ -499,7 +499,7 @@ def setrtcwithntp(ser):
 
 
 def setmqttsrv(ser):
-    processcmd = cmd(ser, ['restore defaults\n', 'mqttsrv ' + host + '\n', 'backup all\n', 'ssid WickedDevice\n', 'pwd wildfire123\n', 'exit\n'])
+    processcmd = cmd(ser, ['restore defaults\n', 'mqttsrv ' + host + '\n', 'backup all\n', 'ssid '+ ssidstring +'\n', 'pwd '+ ssidpwd +'\n', 'exit\n'])
     #processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off -4\n', 'backup tz\n', 'ssid Acknet\n', 'pwd millicat75\n', 'exit\n'])
     time.sleep(4)
 
