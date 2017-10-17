@@ -17,8 +17,8 @@ timezone = '-4.000000000'
 host = 'mqtt.wickeddevice.com'
 offlinemode = False
 datarowsread = 0
-ssidstring = "Acknet"
-ssidpwd = "millicat75"
+ssidstring = "WickedDevice"
+ssidpwd = "wildfire123"
 
 
 class App:
