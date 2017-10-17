@@ -529,14 +529,14 @@ def clearsd(ser):
                 deletelist = sorted(batchlist)
                 print('DEBUG! Here is the whole delete list!' + str(deletelist))
                 processcmd = cmd(ser, ['delete ' + str(deletelist[0])[:8] + ' ' + str(deletelist[-1])[:8] + '\n'])
-            else:
+            elif numberoffiles == 1:
                 print('DEBUG! - single file delete')
                 processcmd = cmd(ser, ['delete ' + str(batchlist[0]) + '\n'])
-
+            else:
+                print('no files remaining...')
 
         time.sleep(2)
         logging.debug('deleted all csv files from SD...')
-
 
 def main():
 
