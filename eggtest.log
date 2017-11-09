@@ -3330,3 +3330,9 @@ INFO:root:FAIL - egg failed at least one test above.  Try running tests again.
 INFO:root:***************************************
 INFO:root: 
 INFO:root: 
+INFO:root:*************************
+INFO:root:***Initialized - appmode RTC***
+INFO:root:eggserial egg008042f8bd9b0120, eggtype CO2, firmware version 2.2.2
+INFO:root:wdpass True, slotpass True,  spipass True, sdpass True, sht25pass True, rtcpass True, esppass True 
+INFO:root:PASSED all self tests
+INFO:root:setting NTP time...
