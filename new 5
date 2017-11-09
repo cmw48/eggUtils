@@ -1,0 +1,891 @@
+chris@Brenner:~/dev/eggUtils$ python eggSearcherPi03.py
+initializing...
+there are 1 com ports available
+/dev/ttyUSB0 - FT231X USB UART
+LINUX! there is an air quality egg on /dev/ttyUSB0
+Found AQE on /dev/ttyUSB0
+There were 1 eggs found.
+connected to port /dev/ttyUSB0
+(0)  +------------------------------------+
+
+(1)  |   Welcome to Air Quality Egg 2.0   |
+
+(2)  |         CO2 Sensor Suite           |
+
+(3)  |       Firmware Version 2.2.2       |
+
+(4)  +------------------------------------+
+
+(5)  Compiled on: Oct 12 2017 17:10:31
+
+(6)  Egg Serial Number: egg008042acbf880131
+
+finished reading...
+read in 6 lines
+(0) 
+
+(1) Info: Tiny Watchdog Initialization...OK.
+
+(2) Info: Slot Select Pins Initialization...OK.
+
+(3) Info: SPI Flash Initialization...OK.
+
+(4) Info: Current firmware signature: 310547 40166
+
+(5) Info: SHT25 Initialization...OK.
+
+(6) Info: BMP280 Initialization...Fail.
+
+(7) Info: RTC Initialization...OK.
+
+(8) Info: SD Card Initialization...OK.
+
+(9) Info: ESP8266 Initialization...OK.
+
+(10) Enter 'aqe' for CONFIG mode.
+
+finished reading...
+read in 10 lines
+aqe
+
+(0) OPERATIONAL mode automatically begins after 12 secs of no input.
+
+(1) 
+
+(2) aqe
+
+(3) 
+
+(4) 
+
+(5) -~=* In CONFIG Mode *=~-
+
+(6) OPERATIONAL mode begins automatically after 5 mins without input.
+
+(7) Enter 'help' for a list of available commands, 
+
+(8) get settings
+
+(9)  +-------------------------------------------------------------+
+
+(10)  | Preferences/Options:                                        |
+
+(11)  +-------------------------------------------------------------+
+
+(12)     Operational Mode: Offline
+
+(13)     Temperature Units: Celsius
+
+(14)     Backlight Settings: 60 seconds, ON at startup
+
+(15)     Sensor Sampling Interval: 5 seconds
+
+(16)     Sensor Averaging Interval: 60 seconds
+
+(17)     Sensor Reporting Interval: 60 seconds
+
+(18)     SoftAP Config: Enabled
+
+(19)  +-------------------------------------------------------------+
+
+(20)  | Location Settings:                                          |
+
+(21)  +-------------------------------------------------------------+
+
+(22)     User Location: Disabled
+
+(23)     GPS: Not installed
+
+(24)     User Latitude: Not set
+
+(25)     User Longitude: Not set
+
+(26)     User Altitude: Not set
+
+(27)  +-------------------------------------------------------------+
+
+(28)  | Network Settings:                                           |
+
+(29)  +-------------------------------------------------------------+
+
+(30)     MAC Address: 5C:CF:7F:D6:84:FF
+
+(31)     Method: Direct Connect
+
+(32)     SSID: No SSID currently configured.
+
+(33)     Security Mode: Automatic - Not Yet Determined
+
+(34)     IP Mode: Configured for DHCP
+
+(35)     Update Server: update.wickeddevice.com
+
+(36)     Update Filename: aqev2_co2_esp
+
+(37)     NTP Server: Disabled
+
+(38)     NTP TZ Offset: -4.000000000
+
+(39)  +-------------------------------------------------------------+
+
+(40)  | MQTT Settings:                                              |
+
+(41)  +-------------------------------------------------------------+
+
+(42)     MQTT Server: mqtt.wickeddevice.com
+
+(43)     MQTT Port: 1883
+
+(44)     MQTT Client ID: egg008042acbf880131
+
+(45)     MQTT Authentication: Enabled
+
+(46)     MQTT Username: egg008042acbf880131
+
+(47)     MQTT Topic Prefix: /orgs/wd/aqe/
+
+(48)     MQTT Topic Suffix: Enabled
+
+(49)  +-------------------------------------------------------------+
+
+(50)  | Credentials:                                                |
+
+(51)  +-------------------------------------------------------------+
+
+(52)     MQTT Password backed up? [* means no]
+
+(53)     Private key backed up? [* means no]
+
+(54)  +-------------------------------------------------------------+
+
+(55)  | Sensor Calibrations:                                        |
+
+(56)  +-------------------------------------------------------------+
+
+(57)     CO2 Offset [V]: nan
+
+(58)     CO2 Baseline Voltage Characterization:
+
+(59)         idx	temp [degC]	slope [V/degC]	intercept [V]
+
+(60)         ---------------------------------------------------------
+
+(61)         No valid entries found.
+
+(62)     Temperature Reporting Offset [degC]: 1.73
+
+(63)     Humidity Reporting Offset [%]: -2.66
+
+(64)  +-------------------------------------------------------------+
+
+(65)  | note: '*' next to label means the setting is not backed up. |
+
+(66)  |     run 'backup all' when you are satisfied                 |
+
+(67)  +-------------------------------------------------------------+
+
+(68) AQE>: 
+
+(69)  @=============================================================@
+
+(70)  # GETTING STARTED                                             #
+
+(71)  #-------------------------------------------------------------#
+
+(72)  #   First type 'ssid your_ssid_here' and & press <enter>      #
+
+(73)  #   Then type 'pwd your_network_password' & press <enter>     #
+
+(74)  #   Then type 'get settings' & press <enter> to review config #
+
+(75)  #   Finally, type 'exit' to go into OPERATIONAL mode,         #
+
+finished reading...
+read in 75 lines
+wdpass True, slotpass True,  spipass True, sdpass True, sht25pass True, rtcpass True, esppass True 
+all self tests PASS
+restore defaults
+
+use ntp
+
+tz_off -4
+
+backup tz
+
+ssid WickedDevice
+
+pwd wildfire123
+
+exit
+
+tzoff -4.000000000, ntpok False 
+(0)  #     and verify that the Egg connects to your network!       #
+
+(1)  @=============================================================@
+
+(2) AQE>: restore defaults
+
+(3) AQE>: softap enable
+
+(4) AQE>: method direct
+
+(5) AQE>: security auto
+
+(6) AQE>: use dhcp
+
+(7) AQE>: opmode normal
+
+(8) AQE>: tempunit C
+
+(9) AQE>: altitude -1
+
+(10) AQE>: backlight 60
+
+(11) AQE>: backlight initon
+
+(12) AQE>: mqttsrv mqtt.wickeddevice.com
+
+(13) AQE>: mqttport 1883
+
+(14) AQE>: mqttauth enable
+
+(15) AQE>: mqttprefix /orgs/wd/aqe/
+
+(16) AQE>: mqttsuffix enable
+
+(17) AQE>: sampling 5, 60, 60
+
+(18) AQE>: ntpsrv disable
+
+(19) AQE>: ntpsrv 0.airqualityegg.pool.ntp.org
+
+(20) AQE>: restore tz_off
+
+(21) AQE>: restore temp_off
+
+(22) AQE>: restore hum_off
+
+(23) AQE>: restore mqttpwd
+
+(24) AQE>: restore mqttid
+
+(25) AQE>: restore updatesrv
+
+(26) AQE>: restore updatefile
+
+(27) AQE>: restore key
+
+(28) AQE>: restore co2
+
+(29) AQE>: restore mac
+
+(30) mac 5c:cf:7f:d6:84:ff
+
+(31) AQE>: 
+
+(32) AQE>: Info: Erasing mirrored config...OK.
+
+(33) 
+
+(34) AQE>: use ntp
+
+(35) AQE>: tz_off -4
+
+(36) AQE>: backup tz
+
+(37) AQE>: ssid WickedDevice
+
+(38) AQE>: pwd wildfire123
+
+(39) AQE>: exit
+
+(40) Exiting CONFIG mode...
+
+(41) -~=* In OPERATIONAL Mode *=~-
+
+(42) Info: Beginning Network Scan...
+
+(43) Info: Network Scan found 17 networks
+
+(44) Info: Access Point "WickedDevice", RSSI = -37
+
+(45) Info: Connecting to Access Point with SSID "WickedDevice"...OK.
+
+(46) Info: Request DHCP...OK.
+
+(47) Info: IP Addr: 192.168.1.127
+
+(48) Info: Netmask: 255.255.255.0
+
+(49) Info: Gateway: 192.168.1.1
+
+(50) Info: Erasing mirrored config...OK.
+
+(51) Info: Writing mirrored config...OK.
+
+(52) Info: Resolved "update.wickeddevice.com" to IP address 45.55.159.249
+
+(53) Info: -------------------------------------
+
+(54) Info: Integrity Checks: 
+
+(55) Info:    File Size: 310547
+
+(56) Info:    CRC16 Checksum: 40166
+
+(57) 
+
+(58) Info: Download Complete
+
+(59) Info: Total Bytes: 212
+
+(60) Info: File Size: 12
+
+(61) Info: Checksum: 61423
+
+(62) Info: Duration: 5133
+
+(63) Info: Signature matches, skipping HEX download.
+
+(64) Info: Current ESP8266 Firmware Version is 1050000
+
+(65) Info: ESP8266 Firmware Version is up to date
+
+debug: ntp test
+10:54:51
+10:52:48
+54
+52
+Debug!  time is within 5 mins of system time
+(66) Info: Getting NTP Time...10/13/2017 10:52:48
+
+(67) Info: Resolved "mqtt.wickeddevice.com" to IP address 104.236.234.98
+
+(68) Info: Connecting to MQTT Broker with Client ID "egg008042acbf880131" using Authentication...OK.
+
+['csv:', 'Timestamp,Temperature[degC],Humidity[percent],CO2[ppm],Pressure[Pa],Latitude[deg],Longitude[deg],Altitude[m]']
+debug: header row!
+(69) csv: Timestamp,Temperature[degC],Humidity[percent],CO2[ppm],Pressure[Pa],Latitude[deg],Longitude[deg],Altitude[m]
+
+10/13/17 10:52:56,24.00,40.11,568.0,0.0,---,---,---
+(70) csv: 10/13/2017 10:52:56,24.00,40.11,568.0,0.0,---,---,---
+
+(71) Info: MQTT publishing to topic /orgs/wd/aqe/heartbeat/egg008042acbf880131...OK.
+
+(72) Info: MQTT publishing to topic /orgs/wd/aqe/temperature/egg008042acbf880131...OK.
+
+(73) Info: MQTT publishing to topic /orgs/wd/aqe/humidity/egg008042acbf880131...OK.
+
+(74) Info: MQTT publishing to topic /orgs/wd/aqe/co2/egg008042acbf880131...OK.
+
+(75) 
+(76) 
+(77) 
+(78) 
+(79) 
+10/13/17 10:53:56,23.96,40.19,569.7,---,---,---,---
+(80) csv: 10/13/2017 10:53:56,23.96,40.19,569.7,---,---,---,---
+
+(81) Info: MQTT publishing to topic /orgs/wd/aqe/temperature/egg008042acbf880131...OK.
+
+(82) Info: MQTT publishing to topic /orgs/wd/aqe/humidity/egg008042acbf880131...OK.
+
+(83) Info: MQTT publishing to topic /orgs/wd/aqe/co2/egg008042acbf880131...OK.
+
+(84) 
+(85) 
+(86) 
+(87) 
+(88) 
+(89) Info: Connecting to MQTT Broker with Client ID "egg008042acbf880131" using Authentication...OK.
+
+10/13/17 10:54:56,23.83,40.44,575.0,---,---,---,---
+(90) csv: 10/13/2017 10:54:56,23.83,40.44,575.0,---,---,---,---
+
+finished reading...
+read in 90 lines
+reconnecting to port /dev/ttyUSB0
+aqe
+
+restore defaults
+
+opmode offline
+
+exit
+
+(0) ----- +------------------------------------+
+
+(1)  |   Welcome to Air Quality Egg 2.0   |
+
+(2)  |         CO2 Sensor Suite           |
+
+(3)  |       Firmware Version 2.2.2       |
+
+(4)  +------------------------------------+
+
+(5)  Compiled on: Oct 12 2017 17:10:31
+
+(6)  Egg Serial Number: egg008042acbf880131
+
+(7) 
+
+(8) Info: Tiny Watchdog Initialization...OK.
+
+(9) Info: Slot Select Pins Initialization...OK.
+
+(10) Info: SPI Flash Initialization...OK.
+
+(11) Info: Current firmware signature: 310547 40166
+
+(12) Info: SHT25 Initialization...OK.
+
+(13) Info: BMP280 Initialization...Fail.
+
+(14) Info: RTC Initialization...OK.
+
+(15) Info: SD Card Initialization...OK.
+
+(16) Info: ESP8266 Initialization...OK.
+
+(17) Info: Startup config integrity check passed, but mirrored config differs, attempting to restore from mirrored configuration.
+
+(18) Error: Mirrored configuration is not valid, cannot restore to last valid configuration.
+
+(19) Enter 'aqe' for CONFIG mode.
+
+(20) OPERATIONAL mode automatically begins after 12 secs of no input.
+
+(21) 11...10...9...8...7...6...5...4...3...2...1...0...
+
+(22) 
+
+(23) -~=* In OPERATIONAL Mode *=~-
+
+(24) Info: Erasing mirrored config...OK.
+
+(25) Info: Writing mirrored config...OK.
+
+['csv:', 'Timestamp,Temperature[degC],Humidity[percent],CO2[ppm],Pressure[Pa],Latitude[deg],Longitude[deg],Altitude[m]']
+debug: header row!
+(26) csv: Timestamp,Temperature[degC],Humidity[percent],CO2[ppm],Pressure[Pa],Latitude[deg],Longitude[deg],Altitude[m]
+
+10/13/17 10:55:39,23.73,40.60,576.0,0.0,---,---,---
+(27) csv: 10/13/2017 10:55:39,23.73,40.60,576.0,0.0,---,---,---
+
+(28) 
+(29) 
+(30) 
+(31) 
+(32) 
+10/13/17 10:56:39,23.73,40.64,573.3,0.0,---,---,---
+(33) csv: 10/13/2017 10:56:39,23.73,40.64,573.3,0.0,---,---,---
+
+(34) 
+(35) 
+(36) 
+(37) 
+(38) 
+10/13/17 10:57:39,23.72,40.73,573.4,0.0,---,---,---
+(39) csv: 10/13/2017 10:57:39,23.72,40.73,573.4,0.0,---,---,---
+
+(40) 
+finished reading...
+read in 40 lines
+reconnecting to port /dev/ttyUSB0
+aqe
+
+list files
+
+(0)  +------------------------------------+
+
+(1)  |   Welcome to Air Quality Egg 2.0   |
+
+(2)  |         CO2 Sensor Suite           |
+
+(3)  |       Firmware Version 2.2.2       |
+
+(4)  +------------------------------------+
+
+(5)  Compiled on: Oct 12 2017 17:10:31
+
+(6)  Egg Serial Number: egg008042acbf880131
+
+(7) 
+
+(8) Info: Tiny Watchdog Initialization...OK.
+
+(9) Info: Slot Select Pins Initialization...OK.
+
+(10) Info: SPI Flash Initialization...OK.
+
+(11) Info: Current firmware signature: 310547 40166
+
+(12) Info: SHT25 Initialization...OK.
+
+(13) Info: BMP280 Initialization...Fail.
+
+(14) Info: RTC Initialization...OK.
+
+(15) Info: SD Card Initialization...OK.
+
+(16) Info: ESP8266 Initialization...OK.
+
+(17) Enter 'aqe' for CONFIG mode.
+
+(18) OPERATIONAL mode automatically begins after 12 secs of no input.
+
+(19) 
+
+(20) aqe
+
+(21) 
+
+(22) 
+
+(23) -~=* In CONFIG Mode *=~-
+
+(24) OPERATIONAL mode begins automatically after 5 mins without input.
+
+(25) Enter 'help' for a list of available commands, 
+
+(26) get settings
+
+(27)  +-------------------------------------------------------------+
+
+(28)  | Preferences/Options:                                        |
+
+(29)  +-------------------------------------------------------------+
+
+(30)     Operational Mode: Offline
+
+(31)     Temperature Units: Celsius
+
+(32)     Backlight Settings: 60 seconds, ON at startup
+
+(33)     Sensor Sampling Interval: 5 seconds
+
+(34)     Sensor Averaging Interval: 60 seconds
+
+(35)     Sensor Reporting Interval: 60 seconds
+
+(36)     SoftAP Config: Enabled
+
+(37)  +-------------------------------------------------------------+
+
+(38)  | Location Settings:                                          |
+
+(39)  +-------------------------------------------------------------+
+
+(40)     User Location: Disabled
+
+(41)     GPS: Not installed
+
+(42)     User Latitude: Not set
+
+(43)     User Longitude: Not set
+
+(44)     User Altitude: Not set
+
+(45)  +-------------------------------------------------------------+
+
+(46)  | Network Settings:                                           |
+
+(47)  +-------------------------------------------------------------+
+
+(48)     MAC Address: 5C:CF:7F:D6:84:FF
+
+(49)     Method: Direct Connect
+
+(50)     SSID: No SSID currently configured.
+
+(51)     Security Mode: Automatic - Not Yet Determined
+
+(52)     IP Mode: Configured for DHCP
+
+(53)     Update Server: update.wickeddevice.com
+
+(54)     Update Filename: aqev2_co2_esp
+
+(55)     NTP Server: Disabled
+
+(56)     NTP TZ Offset: -4.000000000
+
+(57)  +-------------------------------------------------------------+
+
+(58)  | MQTT Settings:                                              |
+
+(59)  +-------------------------------------------------------------+
+
+(60)     MQTT Server: mqtt.wickeddevice.com
+
+(61)     MQTT Port: 1883
+
+(62)     MQTT Client ID: egg008042acbf880131
+
+(63)     MQTT Authentication: Enabled
+
+(64)     MQTT Username: egg008042acbf880131
+
+(65)     MQTT Topic Prefix: /orgs/wd/aqe/
+
+(66)     MQTT Topic Suffix: Enabled
+
+(67)  +-------------------------------------------------------------+
+
+(68)  | Credentials:                                                |
+
+(69)  +-------------------------------------------------------------+
+
+(70)     MQTT Password backed up? [* means no]
+
+(71)     Private key backed up? [* means no]
+
+(72)  +-------------------------------------------------------------+
+
+(73)  | Sensor Calibrations:                                        |
+
+(74)  +-------------------------------------------------------------+
+
+(75)     CO2 Offset [V]: nan
+
+(76)     CO2 Baseline Voltage Characterization:
+
+(77)         idx	temp [degC]	slope [V/degC]	intercept [V]
+
+(78)         ---------------------------------------------------------
+
+(79)         No valid entries found.
+
+(80)     Temperature Reporting Offset [degC]: 1.73
+
+(81)     Humidity Reporting Offset [%]: -2.66
+
+(82)  +-------------------------------------------------------------+
+
+(83)  | note: '*' next to label means the setting is not backed up. |
+
+(84)  |     run 'backup all' when you are satisfied                 |
+
+(85)  +-------------------------------------------------------------+
+
+(86) AQE>: 
+
+(87)  @=============================================================@
+
+(88)  # GETTING STARTED                                             #
+
+(89)  #-------------------------------------------------------------#
+
+(90)  #   First type 'ssid your_ssid_here' and & press <enter>      #
+
+(91)  #   Then type 'pwd your_network_password' & press <enter>     #
+
+(92)  #   Then type 'get settings' & press <enter> to review config #
+
+(93)  #   Finally, type 'exit' to go into OPERATIONAL mode,         #
+
+(94)  #     and verify that the Egg connects to your network!       #
+
+(95)  @=============================================================@
+
+(96) AQE>: list files
+
+DEBUG! 70010100.csv , 70010100
+DEBUG! ['70010100.csv']
+DEBUG! 1 files found
+(97) 70010100.csv		162
+
+DEBUG! 17101217.csv , 17101217
+DEBUG! ['70010100.csv', '17101217.csv']
+DEBUG! 2 files found
+(98) 17101217.csv		270
+
+DEBUG! 17101218.csv , 17101218
+DEBUG! ['70010100.csv', '17101217.csv', '17101218.csv']
+DEBUG! 3 files found
+(99) 17101218.csv		1350
+
+DEBUG! 17101219.csv , 17101219
+DEBUG! ['70010100.csv', '17101217.csv', '17101218.csv', '17101219.csv']
+DEBUG! 4 files found
+(100) 17101219.csv		3240
+
+finished reading...
+read in 100 lines
+download 17101219.csv
+
+DEBUG! 17101220.csv , 17101220
+DEBUG! ['70010100.csv', '17101217.csv', '17101218.csv', '17101219.csv', '17101220.csv']
+DEBUG! 5 files found
+(0) 17101220.csv		3240
+
+DEBUG! 17101221.csv , 17101221
+DEBUG! ['70010100.csv', '17101217.csv', '17101218.csv', '17101219.csv', '17101220.csv', '17101221.csv']
+DEBUG! 6 files found
+(1) 17101221.csv		3240
+
+DEBUG! 17101222.csv , 17101222
+DEBUG! ['70010100.csv', '17101217.csv', '17101218.csv', '17101219.csv', '17101220.csv', '17101221.csv', '17101222.csv']
+DEBUG! 7 files found
+(2) 17101222.csv		3240
+
+DEBUG! 17101223.csv , 17101223
+DEBUG! ['70010100.csv', '17101217.csv', '17101218.csv', '17101219.csv', '17101220.csv', '17101221.csv', '17101222.csv', '17101223.csv']
+DEBUG! 8 files found
+(3) 17101223.csv		3240
+
+DEBUG! 17101300.csv , 17101300
+DEBUG! ['70010100.csv', '17101217.csv', '17101218.csv', '17101219.csv', '17101220.csv', '17101221.csv', '17101222.csv', '17101223.csv', '17101300.csv']
+DEBUG! 9 files found
+(4) 17101300.csv		3240
+
+DEBUG! 17101301.csv , 17101301
+DEBUG! ['70010100.csv', '17101217.csv', '17101218.csv', '17101219.csv', '17101220.csv', '17101221.csv', '17101222.csv', '17101223.csv', '17101300.csv', '17101301.csv']
+DEBUG! 10 files found
+(5) 17101301.csv		3240
+
+DEBUG! 17101302.csv , 17101302
+DEBUG! ['70010100.csv', '17101217.csv', '17101218.csv', '17101219.csv', '17101220.csv', '17101221.csv', '17101222.csv', '17101223.csv', '17101300.csv', '17101301.csv', '17101302.csv']
+DEBUG! 11 files found
+(6) 17101302.csv		3240
+
+DEBUG! 17101303.csv , 17101303
+DEBUG! ['70010100.csv', '17101217.csv', '17101218.csv', '17101219.csv', '17101220.csv', '17101221.csv', '17101222.csv', '17101223.csv', '17101300.csv', '17101301.csv', '17101302.csv', '17101303.csv']
+DEBUG! 12 files found
+(7) 17101303.csv		3294
+
+DEBUG! 17101304.csv , 17101304
+DEBUG! ['70010100.csv', '17101217.csv', '17101218.csv', '17101219.csv', '17101220.csv', '17101221.csv', '17101222.csv', '17101223.csv', '17101300.csv', '17101301.csv', '17101302.csv', '17101303.csv', '17101304.csv']
+DEBUG! 13 files found
+(8) 17101304.csv		3240
+
+DEBUG! 17101305.csv , 17101305
+DEBUG! ['70010100.csv', '17101217.csv', '17101218.csv', '17101219.csv', '17101220.csv', '17101221.csv', '17101222.csv', '17101223.csv', '17101300.csv', '17101301.csv', '17101302.csv', '17101303.csv', '17101304.csv', '17101305.csv']
+DEBUG! 14 files found
+(9) 17101305.csv		3240
+
+DEBUG! 17101306.csv , 17101306
+DEBUG! ['70010100.csv', '17101217.csv', '17101218.csv', '17101219.csv', '17101220.csv', '17101221.csv', '17101222.csv', '17101223.csv', '17101300.csv', '17101301.csv', '17101302.csv', '17101303.csv', '17101304.csv', '17101305.csv', '17101306.csv']
+DEBUG! 15 files found
+(10) 17101306.csv		3240
+
+DEBUG! 17101307.csv , 17101307
+DEBUG! ['70010100.csv', '17101217.csv', '17101218.csv', '17101219.csv', '17101220.csv', '17101221.csv', '17101222.csv', '17101223.csv', '17101300.csv', '17101301.csv', '17101302.csv', '17101303.csv', '17101304.csv', '17101305.csv', '17101306.csv', '17101307.csv']
+DEBUG! 16 files found
+(11) 17101307.csv		3240
+
+DEBUG! 17101308.csv , 17101308
+DEBUG! ['70010100.csv', '17101217.csv', '17101218.csv', '17101219.csv', '17101220.csv', '17101221.csv', '17101222.csv', '17101223.csv', '17101300.csv', '17101301.csv', '17101302.csv', '17101303.csv', '17101304.csv', '17101305.csv', '17101306.csv', '17101307.csv', '17101308.csv']
+DEBUG! 17 files found
+(12) 17101308.csv		3240
+
+DEBUG! 17101309.csv , 17101309
+DEBUG! ['70010100.csv', '17101217.csv', '17101218.csv', '17101219.csv', '17101220.csv', '17101221.csv', '17101222.csv', '17101223.csv', '17101300.csv', '17101301.csv', '17101302.csv', '17101303.csv', '17101304.csv', '17101305.csv', '17101306.csv', '17101307.csv', '17101308.csv', '17101309.csv']
+DEBUG! 18 files found
+(13) 17101309.csv		3240
+
+DEBUG! 17101310.csv , 17101310
+DEBUG! ['70010100.csv', '17101217.csv', '17101218.csv', '17101219.csv', '17101220.csv', '17101221.csv', '17101222.csv', '17101223.csv', '17101300.csv', '17101301.csv', '17101302.csv', '17101303.csv', '17101304.csv', '17101305.csv', '17101306.csv', '17101307.csv', '17101308.csv', '17101309.csv', '17101310.csv']
+DEBUG! 19 files found
+(14) 17101310.csv		2862
+
+(15) AQE>: download 17101219.csv
+
+(16) Timestamp,Temperature[degC],Humidity[percent],CO2[ppm],Pressure[Pa],Latitude[deg],Longitude[deg],Altitude[m]
+
+(17) 10/12/2017 19:00:46,23.35,45.17,506.3,---,---,---,---
+
+(18) 10/12/2017 19:01:46,23.42,44.93,504.6,---,---,---,---
+
+(19) 10/12/2017 19:02:46,23.48,44.75,502.5,---,---,---,---
+
+(20) 10/12/2017 19:03:45,23.58,44.59,499.4,---,---,---,---
+
+(21) 10/12/2017 19:04:45,23.68,44.38,499.1,---,---,---,---
+
+(22) 10/12/2017 19:05:45,23.77,44.19,497.6,---,---,---,---
+
+(23) 10/12/2017 19:06:45,23.82,44.03,495.8,---,---,---,---
+
+(24) 10/12/2017 19:07:45,23.89,43.85,494.2,---,---,---,---
+
+(25) 10/12/2017 19:08:45,23.95,43.71,493.0,---,---,---,---
+
+(26) 10/12/2017 19:09:45,24.01,43.54,491.4,---,---,---,---
+
+(27) 10/12/2017 19:10:45,24.04,43.41,490.7,---,---,---,---
+
+(28) 10/12/2017 19:11:45,24.09,43.28,489.6,---,---,---,---
+
+(29) 10/12/2017 19:12:45,24.14,43.14,487.7,---,---,---,---
+
+(30) 10/12/2017 19:13:45,24.19,43.02,481.3,---,---,---,---
+
+(31) 10/12/2017 19:14:45,24.22,42.87,479.9,---,---,---,---
+
+(32) 10/12/2017 19:15:45,24.23,42.83,480.2,---,---,---,---
+
+(33) 10/12/2017 19:16:45,24.24,42.80,478.9,---,---,---,---
+
+(34) 10/12/2017 19:17:45,24.24,42.73,477.9,---,---,---,---
+
+(35) 10/12/2017 19:18:46,24.25,42.67,477.3,---,---,---,---
+
+(36) 10/12/2017 19:19:45,24.28,42.62,477.4,---,---,---,---
+
+(37) 10/12/2017 19:20:45,24.30,42.54,478.9,---,---,---,---
+
+(38) 10/12/2017 19:21:45,24.33,42.47,478.1,---,---,---,---
+
+(39) 10/12/2017 19:22:45,24.34,42.41,474.3,---,---,---,---
+
+(40) 10/12/2017 19:23:45,24.34,42.37,473.4,---,---,---,---
+
+(41) 10/12/2017 19:24:45,24.34,42.34,472.3,---,---,---,---
+
+(42) 10/12/2017 19:25:45,24.37,42.21,471.9,---,---,---,---
+
+(43) 10/12/2017 19:26:45,24.38,42.16,472.7,---,---,---,---
+
+(44) 10/12/2017 19:27:45,24.38,42.13,473.0,---,---,---,---
+
+(45) 10/12/2017 19:28:45,24.40,42.03,472.6,---,---,---,---
+
+(46) 10/12/2017 19:29:46,24.42,41.91,472.2,---,---,---,---
+
+(47) 10/12/2017 19:30:45,24.43,41.85,472.2,---,---,---,---
+
+(48) 10/12/2017 19:31:45,24.42,41.90,469.5,---,---,---,---
+
+(49) 10/12/2017 19:32:45,24.40,41.96,468.1,---,---,---,---
+
+(50) 10/12/2017 19:33:45,24.41,41.97,468.1,---,---,---,---
+
+finished reading...
+read in 50 lines
+Finished downloading...
+egg008042acbf880131
+
+
+Firmware version 2.2.2: PASS
+tz set to -4.000000000: PASS
+ntp time correct PASS
+real time clock set up and correct PASS
+tzoff -4.000000000, ntpok True 
+all self tests PASS
+wdpass True, slotpass True,  spipass True, sdpass True, sht25pass True, rtcpass True, esppass True 
+all self tests PASS
+temp and humidity offsets entered PASS
+egg008042acbf880131
+
+
+Firmware version 2.2.2: PASS
+tz set to -4.000000000: PASS
+ntp time correct PASS
+real time clock set up and correct PASS
+tzoff -4.000000000, ntpok True 
+all self tests PASS
+wdpass True, slotpass True,  spipass True, sdpass True, sht25pass True, rtcpass True, esppass True 
+all self tests PASS
+temp and humidity offsets entered PASS
+press any key to test another egg... 

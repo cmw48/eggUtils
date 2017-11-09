@@ -1,0 +1,54 @@
+
+this is the egg in the temp box: 
+egg00802e3175980123   - redo blv
+
+c eggs need ofs calculated
+egg00802e3172980123  OFFL
+egg00802e07818b0112  needs PM offset
+egg00802e630c880122  OFFL
+egg00802e62c6880122  OFFL
+egg00802e316c9b0123  OFFL
+egg00802ebee4980120  OFFL
+egg00802e31aa0b0123  OFFL
+egg00802ebb942b0121  OFFL
+
+wisc B
+egg00802e651d980130 - backup, needs gps, low so2, super flat o3
+egg00802e65530b0130 - low so2
+egg00802e3127190123 = o3 high so2 low
+egg00802ebe9a9b0120 - redo blv change 
+egg00802e27e9880132   o3 high  so2 okay
+egg00802ebb55080121 - 03 high
+egg00802d567e8b0133 - o3 okay, 
+
+egg00802e3177090123 - OFFL
+
+egg00802ebb14ab0121  SO2 looks flat (not negz?) , o3 too high, redo. 
+egg00802e63448b0122 - so2 is negz 1,  
+egg00802ebea0980120  needs temp and hum ofs, o3 is high, so2 is okay
+egg00802ebb560b0121  so2 up 50?
+
+eeg00802ebb55080121 - flatline pressure  so2 okay, o3 high
+
+
+Model A
+egg00802260b51b0151
+egg0080228d221b0140
+egg008020c109980153 - NO2 is too high, o3 is way too low
+egg0080225cfd080143
+egg008022c2b2180141  CO is okay
+egg00802e630f990122 - NO2 is too high CO is okay has pressure
+egg008022c45c1b0141
+egg00802e316e180123  has pressure
+egg008022c2f2080141
+egg00802201d7ab0152  CO is okay
+
+
+5 model D eggs, redo watchdog, temp and hum
+
+
+REF
+egg00802294f10b0142
+egg00802cfec2080100 CO2 dev egg
+egg00802fbeaf1b0130
+

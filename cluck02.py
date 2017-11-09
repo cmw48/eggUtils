@@ -13,7 +13,7 @@ ser = serial.Serial()
 #declare pass fail conditions
 fwver = '2.2.2'
 fwsig = '310547 40166'
-timezone = '-4.000000000'
+timezone = '-5.000000000'
 host = 'mqtt.wickeddevice.com'
 offlinemode = False
 datarowsread = 0
@@ -469,7 +469,7 @@ def getconfigmode(ser):
 def getsettings(ser):
     if thisEgg.eggtype == 'CO2':
         print('CO2 egg...')
-        readserial(ser, 75)
+        readserial(ser, 78)
     elif thisEgg.eggtype == 'VOC':
         print('VOC egg...')
         readserial(ser, 88)
