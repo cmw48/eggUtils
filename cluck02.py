@@ -13,7 +13,7 @@ ser = serial.Serial()
 #declare pass fail conditions
 fwver = '2.2.2'
 fwsig = '310547 40166'
-timezone = '-5.000000000'
+timezone = '-4.000000000'
 host = 'mqtt.wickeddevice.com'
 offlinemode = False
 datarowsread = 0
@@ -164,11 +164,12 @@ class Egg:
             logging.info('FAIL - did not connect to MQTT')
             self.allpass = False
 
-        if (self.tempoff <> 0.0) and (self.humoff <> 0.0):
-            print ('PASS - temp and humidity offsets are nonzero')
-        else:
-            print ('FAIL - temp and/or humidity offsets not entered')
-            self.allpass = False
+        #reinstate this for final testing
+        #if (self.tempoff <> 0.0) and (self.humoff <> 0.0):
+        #    print ('PASS - temp and humidity offsets are nonzero')
+        #else:
+        #    print ('FAIL - temp and/or humidity offsets not entered')
+        #    self.allpass = False
 
         if self.dlfile == True:
             print ('PASS - file download OK')
@@ -194,7 +195,7 @@ def parseEggData(thisEgg, words):
     csvdate = ''
     global datarowsread
     global offlinemode
-    filelist = []
+    #filelist = []
     #print 'debug! number of words ' + str(numwords)
 
 
@@ -424,11 +425,11 @@ def readserial(ser, numlines):
             print 'Debug! just got done with ESP8266 update, restart and redo ntp'
         elif parsereturn == 'blank':
             blankcount = blankcount + 1
-            if blankcount > 3:
-                print('Debug! too many blank lines')
+            if blankcount > 6:
+                print('Debug! waited too long, continuing')
                 readmore = False
             else:
-                print('Debug! = blank line ' + str(blankcount))
+                print('Debug! = waiting... ' + str(blankcount))
 
         else:
             print('(' + str(readcount) + ') ' + rcv1 + ' ' + str(numlines))
@@ -469,7 +470,7 @@ def getconfigmode(ser):
 def getsettings(ser):
     if thisEgg.eggtype == 'CO2':
         print('CO2 egg...')
-        readserial(ser, 78)
+        readserial(ser, 77)
     elif thisEgg.eggtype == 'VOC':
         print('VOC egg...')
         readserial(ser, 88)
@@ -508,7 +509,7 @@ def clearsd(ser):
         logging.info ("reading files on SD card...")
         thisEgg.filelist = []
         processcmd = cmd(ser, ['list files\n'])
-        readserial(ser, 200)
+        readserial(ser, 20)
         print(thisEgg.filelist)
         if len(thisEgg.filelist) == 0:
             print('No files to delete!')
@@ -665,8 +666,6 @@ def main():
             thisEgg.dlfile = False
         else:
             processcmd = cmd(ser, ['download ' + str(thisEgg.filelist[lastfile]) + '\n'])
-            print('No files to download.  FAIL')
-            logging.info('No files to download.  FAIL')
             readserial(ser, 100)
             logging.debug ('Finished downloading...')
             thisEgg.dlfile = True
