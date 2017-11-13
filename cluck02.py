@@ -13,7 +13,7 @@ ser = serial.Serial()
 #declare pass fail conditions
 fwver = '2.2.2'
 fwsig = '310547 40166'
-timezone = '-4.000000000'
+timezone = '-5.000000000'
 host = 'mqtt.wickeddevice.com'
 offlinemode = False
 datarowsread = 0
@@ -178,8 +178,8 @@ class Egg:
             self.allpass = False
 
         if self.allpass == True:
-            print ('PASS - egg passes all tests.  Ready to pack')
-            logging.info ('PASS - egg passes all tests.  Ready to pack')
+            print ('PASS - egg passes all tests.  Ready for temp and humidity testing.')
+            logging.info ('PASS - egg passes all tests.  Ready for temp and humidity testing.')
         else:
             print ('FAIL - egg failed at least one test above.  Try running tests again.')
             logging.info  ('FAIL - egg failed at least one test above.  Try running tests again.')
@@ -188,14 +188,13 @@ thisEgg = Egg()
 
 lastfile = 0
 
-
 def parseEggData(thisEgg, words):
     ignoreline = False
     numwords = len(words)
     csvdate = ''
     global datarowsread
     global offlinemode
-    #filelist = []
+    filelist = []
     #print 'debug! number of words ' + str(numwords)
 
 
@@ -334,9 +333,10 @@ def parseEggData(thisEgg, words):
                 logging.info(csvdate + ' ' + str(words[2]))
                 datarowsread += 1
                 print('Debug! datarows - ' + str(datarowsread) )
-                if datarowsread >= 3:
-                    return 'done'
+                if datarowsread >= 4:
                     datarowsread = 0
+                    return 'done'
+
                 else:
                     pass
 
@@ -418,18 +418,18 @@ def readserial(ser, numlines):
         words = rcv1.split()
         parsereturn = parseEggData(thisEgg, words)
         if parsereturn == 'done':
-            print 'Debug! early terminate for readlines'
+            print 'Debug! we are all done reading'
             blankcount = 0
             readmore = False
         elif parsereturn == 'espupd':
             print 'Debug! just got done with ESP8266 update, restart and redo ntp'
         elif parsereturn == 'blank':
             blankcount = blankcount + 1
-            if blankcount > 6:
+            if blankcount > 7:
                 print('Debug! waited too long, continuing')
                 readmore = False
             else:
-                print('Debug! = waiting... ' + str(blankcount))
+                print('Debug! = waiting... ' + str(blankcount) + '0 seconds')
 
         else:
             print('(' + str(readcount) + ') ' + rcv1 + ' ' + str(numlines))
@@ -439,13 +439,15 @@ def readserial(ser, numlines):
             readcount = 0
             readmore = False
             print 'finished reading...'
-    print 'read in ' + str(numlines) + ' lines'
+            print 'read in ' + str(numlines) + ' lines'
+        else:
+           pass
 
 def cmd (ser, cmdlist):
     for cmd in cmdlist:
         ser.write(cmd)
         print cmd
-        time.sleep(2)
+        time.sleep(1)
     return 'command list processed...'
 
 
@@ -453,9 +455,9 @@ def getconfigmode(ser):
     processcmd = ''
     ser.close()  # In case the port is already open this closes it.
     ser.open()   # Reopen the port.
-    time.sleep(4)
+    time.sleep(3)
     processcmd = cmd(ser, ['aqe\n'])
-    time.sleep(2)
+    time.sleep(1)
     #get just enough of header to determine egg type
     readserial(ser, 6)
     thisEgg.introduce()
@@ -465,7 +467,7 @@ def getconfigmode(ser):
     else:
         #gas egg, immediately read 15 more lines
         readserial(ser, 13)
-    time.sleep(5)
+    time.sleep(4)
 
 def getsettings(ser):
     if thisEgg.eggtype == 'CO2':
@@ -486,15 +488,15 @@ def getsettings(ser):
 
     # gas egg displays 99 lines after AQE
     #readserial(ser, 99)
-    time.sleep(2)
+    time.sleep(1)
 
 def setrtcwithntp(ser):
-    processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off -4\n', 'backup tz\n', 'ssid '+ ssidstring +'\n', 'pwd '+ ssidpwd +'\n', 'exit\n'])
+    processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off -5\n', 'backup tz\n', 'ssid '+ ssidstring +'\n', 'pwd '+ ssidpwd +'\n', 'exit\n'])
     #processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off -4\n', 'backup tz\n', 'ssid Acknet\n', 'pwd millicat75\n', 'exit\n'])
-    time.sleep(2)
+    time.sleep(1)
     thisEgg.rtctest()
     logging.info ("restarting...")
-    readserial(ser, 75)
+    readserial(ser, 85)
     ser.close()  # In case the port is already open this closes it.
     ser.open()   # Reopen the port.
 
@@ -502,15 +504,18 @@ def setrtcwithntp(ser):
 def setmqttsrv(ser):
     processcmd = cmd(ser, ['restore defaults\n', 'mqttsrv ' + host + '\n', 'backup all\n', 'ssid '+ ssidstring +'\n', 'pwd '+ ssidpwd +'\n', 'exit\n'])
     #processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off -4\n', 'backup tz\n', 'ssid Acknet\n', 'pwd millicat75\n', 'exit\n'])
-    time.sleep(4)
+    time.sleep(3)
 
 def clearsd(ser):
         batchlist = []
         logging.info ("reading files on SD card...")
         thisEgg.filelist = []
         processcmd = cmd(ser, ['list files\n'])
-        readserial(ser, 20)
-        print(thisEgg.filelist)
+        print 'DERP!'
+        readserial(ser, 5)
+        print 'nerp!'
+        print('here is the file list - ')
+        print (thisEgg.filelist)
         if len(thisEgg.filelist) == 0:
             print('No files to delete!')
         else:
@@ -536,7 +541,7 @@ def clearsd(ser):
             else:
                 print('no files remaining...')
 
-        time.sleep(2)
+        time.sleep(1)
         logging.debug('deleted all csv files from SD...')
 
 def main():
@@ -594,7 +599,7 @@ def main():
                 #sys.exit() # Terminates Script.
             #portcount = portcount + 1
 
-        time.sleep(2)  # pause before looping again-  check ports again in 2 seconds
+        time.sleep(1)  # pause before looping again-  check ports again in 2 seconds
     time.sleep(2)  # Gives user 2 seconds to view Port information
 
     # Set Port
@@ -638,11 +643,11 @@ def main():
 
         logging.info('setting offline mode...')
         processcmd = cmd(ser, ['aqe\n'])
-        time.sleep(2)
+        time.sleep(1)
         clearsd(ser)
-        time.sleep(2)
+        time.sleep(1)
         processcmd = cmd(ser, ['restore defaults\n'])
-        time.sleep(3)
+        time.sleep(2)
         processcmd = cmd(ser, ['opmode offline\n', 'exit\n'])
         offlinemode = True
         logging.info ("restarting...")
@@ -653,10 +658,10 @@ def main():
         ser.close()  # In case the port is already open this closes it.
         ser.open()   # Reopen the port.
         logging.debug ("reconnecting to port " + eggComPort)
-        time.sleep(3)
+        time.sleep(2)
         logging.info ("reading files on SD card...")
         processcmd = cmd(ser, ['aqe\n'])
-        time.sleep(4)
+        time.sleep(3)
         thisEgg.filelist = []
         processcmd = cmd(ser, ['list files\n'])
         readserial(ser, 97)
