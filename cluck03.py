@@ -13,7 +13,7 @@ ser = serial.Serial()
 #declare pass fail conditions
 fwver = '2.2.2'
 fwsig = '310547 40166'
-timezone = '-5.000000000'
+timezone = '-4.000000000'
 host = 'mqtt.wickeddevice.com'
 offlinemode = False
 datarowsread = 0
@@ -75,6 +75,8 @@ class Egg:
         self.sht25pass = False
         self.rtcpass = False
         self.esppass = False
+        self.co2pass = False
+        self.co2value = 0.0
         self.firmsig = ''
         self.ntpok = False
         self.firstread = []
@@ -154,6 +156,14 @@ class Egg:
         else:
             print('FAIL - did not connect to wifi')
             logging.info('FAIL - did not connect to wifi')
+            self.allpass = False
+
+        if (300.0 < self.co2value) and (self.co2value < 800.0):
+            print 'CO2 value in bounds - ' + str(self.co2value)
+            self.co2pass = True
+        else:
+            print 'CO2 value out of bounds - ' + str(self.co2value)
+            self.co2pass = False
             self.allpass = False
 
         if self.mqttconnack == True:
@@ -274,7 +284,9 @@ def parseEggData(thisEgg, words):
                     ntpmin = ntptime[3:5]
                     logging.debug (timemin)
                     logging.debug (ntpmin)
-                    if timehour == ntphour:
+                    #if timehour == ntphour:  would be cool if our actual time matched the egg time
+                    print str(int(timehour)+1) + ' ' + str(int(ntphour))
+                    if (int(timehour)+1) == int(ntphour):
                         timediff = int(ntpmin)- int(timemin)
                         if abs(timediff) < 5:
                             logging.debug ('Debug!  time is within 5 mins of system time')
@@ -338,7 +350,22 @@ def parseEggData(thisEgg, words):
                     return 'done'
 
                 else:
-                    pass
+                    print 'csv data incoming!'
+                    print str(words)
+                    newlist = []
+                    for word in words:
+                        word = word.split(",")
+                        newlist.append(word)  # <----
+
+
+                    print 'derpomatic!'
+                    co2val =  str(newlist[2][3])
+                    print co2val
+                    print (float(co2val))
+                    thisEgg.co2value = float(co2val)
+
+                    # break out data from csv string
+
 
                 #TODO: need a pass fail condition
 
@@ -375,6 +402,7 @@ def parseEggData(thisEgg, words):
                 print 'DEBUG! ' + str(filelist)
                 print 'DEBUG! ' + str(lastfile) + ' files found'
             elif words[0] == "csv:":
+
                 # because this line is 2 words, it's a HEADER row
                 if offlinemode == False:
                     print('publishing online mqtt data')
@@ -382,12 +410,6 @@ def parseEggData(thisEgg, words):
                 else:
                     print('writing offline data to SD')
                     logging.info('writing offline data to SD')
-                    csvdata = words[1].split
-                    print 'heres the CSV data:'
-                    print str(csvdata[4])
-
-                print str(words)
-                # break out data from csv string
 
                 logging.info(str(words[1:]))
 
@@ -438,7 +460,8 @@ def readserial(ser, numlines):
                 print('Debug! = waiting... ' + str(blankcount) + '0 seconds')
 
         else:
-            print('(' + str(readcount) + ') ' + rcv1 + ' ' + str(numlines))
+            #print('(' + str(readcount) + ') ' + rcv1 + ' ' + str(numlines))
+            print('(' + str(readcount) + ') ' + rcv1)
             blankcount = 0
         readcount = readcount + 1
         if (readcount > numlines):
@@ -497,7 +520,7 @@ def getsettings(ser):
     time.sleep(1)
 
 def setrtcwithntp(ser):
-    processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off -5\n', 'backup tz\n', 'ssid '+ ssidstring +'\n', 'pwd '+ ssidpwd +'\n', 'exit\n'])
+    processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off -4\n', 'backup tz\n', 'ssid '+ ssidstring +'\n', 'pwd '+ ssidpwd +'\n', 'exit\n'])
     #processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off -4\n', 'backup tz\n', 'ssid Acknet\n', 'pwd millicat75\n', 'exit\n'])
     time.sleep(1)
     thisEgg.rtctest()
@@ -698,7 +721,7 @@ def main():
 
 
 
-    print('***CLICK START TO RUN AGAIN***')
+    print('***CLICK A BUTTON TO RUN AGAIN***')
     return
 
 
