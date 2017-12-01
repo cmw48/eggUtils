@@ -158,7 +158,7 @@ class Egg:
             logging.info('FAIL - did not connect to wifi')
             self.allpass = False
 
-        if (300.0 < self.co2value) and (self.co2value < 1300.0):
+        if (300.0 < self.co2value) and (self.co2value < 800.0):
             print 'CO2 value in bounds - ' + str(self.co2value)
             self.co2pass = True
         else:
@@ -257,7 +257,11 @@ def parseEggData(thisEgg, words):
                         thisEgg.mqttconnack = True
                     else:
                         thisEgg.mqttconnack = False
-
+            elif words[1] == "Failed":
+                if words[2]  == 'Resolved':
+                    thisEgg.ntpok = False
+                    print('set ntp failed - restarting')
+                    return 'restart'
 
                 if words[3] == "Access":
                     ssidconnect =  words[7]
@@ -294,6 +298,7 @@ def parseEggData(thisEgg, words):
                             thisEgg.rtctest()
                         else:
                             logging.debug ('Debug!  RTC time does not match system time')
+                            thisEgg.ntpok = False
                             thisEgg.rtctest()
 
             elif words[1] == "Current":
@@ -458,6 +463,8 @@ def readserial(ser, numlines):
                 readmore = False
             else:
                 print('Debug! = waiting... ' + str(blankcount) + '0 seconds')
+        elif parsereturn == 'restart':
+            print 'restarting...'
 
         else:
             #print('(' + str(readcount) + ') ' + rcv1 + ' ' + str(numlines))
@@ -650,7 +657,9 @@ def main():
         # send RTC / NTP commands and reset
         setrtcwithntp(ser)
         # verify rtc set
-
+        # if thisEgg.ntpok then continue else repeat
+        ## ALSO if thisEgg.mqtt successful then continue else repeat
+        ## consider breaking up setrtcwithntp and mqtt verify into separate steps
         # restart
         #  are there esp reload issues?
           #Info: ESP8266 Firmware Version is up to date
@@ -675,7 +684,9 @@ def main():
         processcmd = cmd(ser, ['aqe\n'])
         time.sleep(1)
         clearsd(ser)
+        # if thisEgg.ntpok then continue else repeat
         time.sleep(1)
+
         processcmd = cmd(ser, ['restore defaults\n'])
         time.sleep(2)
         processcmd = cmd(ser, ['opmode offline\n', 'exit\n'])
