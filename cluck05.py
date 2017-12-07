@@ -285,8 +285,8 @@ def parseEggData(thisEgg, words):
                     logging.debug (timemin)
                     logging.debug (ntpmin)
                     #if timehour == ntphour:  would be cool if our actual time matched the egg time
-                    print str(int(timehour)+-8) + ' ' + str(int(ntphour))
-                    if (int(timehour)+8) == int(ntphour):
+                    print str(int(timehour)-8) + ' ' + str(int(ntphour))
+                    if (int(timehour)-8) == int(ntphour):
                         timediff = int(ntpmin)- int(timemin)
                         if abs(timediff) < 5:
                             logging.debug ('Debug!  time is within 5 mins of system time')
