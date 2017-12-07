@@ -11,9 +11,9 @@ import tkFont
 # declare once
 ser = serial.Serial()
 #declare pass fail conditions
-fwver = '2.2.2'
-fwsig = '310547 40166'
-timezone = '-4.000000000'
+fwver = '2.2.3'
+fwsig = '334761 60245'
+timezone = '11.000000000'
 host = 'mqtt.wickeddevice.com'
 offlinemode = False
 datarowsread = 0
@@ -519,7 +519,7 @@ def getsettings(ser):
     time.sleep(1)
 
 def setrtcwithntp(ser):
-    processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off +11\n', 'backup tz\n', 'ssid '+ ssidstring +'\n', 'pwd '+ ssidpwd +'\n', 'exit\n'])
+    processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off 11\n', 'backup tz\n', 'ssid '+ ssidstring +'\n', 'pwd '+ ssidpwd +'\n', 'exit\n'])
     #processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off -4\n', 'backup tz\n', 'ssid Acknet\n', 'pwd millicat75\n', 'exit\n'])
     time.sleep(1)
     thisEgg.rtctest()
