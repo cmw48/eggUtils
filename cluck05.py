@@ -13,13 +13,13 @@ ser = serial.Serial()
 #declare pass fail conditions
 fwver = '2.2.3'
 fwsig = '334761 60245'
-timezone = '11.000000000'
+tz_off = '-4'
+timezone = tz_off + '.000000000'
 host = 'mqtt.wickeddevice.com'
 offlinemode = False
 datarowsread = 0
 ssidstring = "WickedDevice"
 ssidpwd = "wildfire123"
-
 
 class App:
     def __init__(self, master):
@@ -519,8 +519,8 @@ def getsettings(ser):
     time.sleep(1)
 
 def setrtcwithntp(ser):
-    processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off 11\n', 'backup tz\n', 'ssid '+ ssidstring +'\n', 'pwd '+ ssidpwd +'\n', 'exit\n'])
-    #processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off -4\n', 'backup tz\n', 'ssid Acknet\n', 'pwd millicat75\n', 'exit\n'])
+    processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off ' + tz_off + '\n', 'backup tz\n', 'ssid '+ ssidstring +'\n', 'pwd '+ ssidpwd +'\n', 'exit\n'])
+    #processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off ' + tz_off + '\n', 'backup tz\n', 'ssid Acknet\n', 'pwd millicat75\n', 'exit\n'])
     time.sleep(1)
     thisEgg.rtctest()
     logging.info ("restarting...")
@@ -541,7 +541,7 @@ def clearsd(ser):
         processcmd = cmd(ser, ['list files\n'])
         # need a new way to count files and determine when reading is complete
         # technically, count files until first blank line would do it if we took local control here
-        readserial(ser, 5)
+        readserial(ser, 20)
 
         print('here is the file list - ')
         print (thisEgg.filelist)
