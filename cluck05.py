@@ -114,6 +114,7 @@ class Egg:
         logging.info(rtcmsg)
 
     def finaltest(self):
+        print ('eggserial: ' + self.eggserial)
         logging.info (self.eggserial)
         logging.info (self.macaddr)
         logging.info (self.mqtthost)
@@ -271,30 +272,37 @@ def parseEggData(thisEgg, words):
 
             elif words[1] == "Getting":
                 if words[2] == "NTP":
-                    logging.debug ('debug: ntp test')
-                    now = datetime.datetime.now()
-                    timehack = now.strftime("%H:%M:%S")
-                    print('Debug! ' + words[3] + ' ' + words[4] )
-                    ntptime = str(words[4])
-                    logging.debug (timehack)
-                    logging.debug (ntptime)
-                    timehour = timehack[:2]
-                    ntphour = ntptime[:2]
-                    timemin = timehack[3:5]
-                    ntpmin = ntptime[3:5]
-                    logging.debug (timemin)
-                    logging.debug (ntpmin)
-                    #if timehour == ntphour:  would be cool if our actual time matched the egg time
-                    print str(int(timehour)+1) + ' ' + str(int(ntphour))
-                    if (int(timehour)+1) == int(ntphour):
-                        timediff = int(ntpmin)- int(timemin)
-                        if abs(timediff) < 5:
-                            logging.debug ('Debug!  time is within 5 mins of system time')
-                            thisEgg.ntpok = True
-                            thisEgg.rtctest()
-                        else:
-                            logging.debug ('Debug!  RTC time does not match system time')
-                            thisEgg.rtctest()
+                    time.sleep(3)
+                    wordslen = len(words)
+                    print('length of array is ' + str(wordslen))
+                    if wordslen > 3:
+                      logging.debug ('debug: ntp test')
+                      now = datetime.datetime.now()
+                      timehack = now.strftime("%H:%M:%S")
+                      print('Debug! ' + words[3] + ' ' + words[4] )
+                      ntptime = str(words[4])
+                      logging.debug (timehack)
+                      logging.debug (ntptime)
+                      timehour = timehack[:2]
+                      ntphour = ntptime[:2]
+                      timemin = timehack[3:5]
+                      ntpmin = ntptime[3:5]
+                      logging.debug (timemin)
+                      logging.debug (ntpmin)
+                      #if timehour == ntphour:  would be cool if our actual time matched the egg time
+                      print str(int(timehour)+1) + ' ' + str(int(ntphour))
+                      if (int(timehour)+1) == int(ntphour):
+                          timediff = int(ntpmin)- int(timemin)
+                          if abs(timediff) < 5:
+                              logging.debug ('Debug!  time is within 5 mins of system time')
+                              thisEgg.ntpok = True
+                              thisEgg.rtctest()
+                          else:
+                              logging.debug ('Debug!  RTC time does not match system time')
+                              thisEgg.rtctest()
+                    else:
+                        # wordlen > 3 means we didn't get ntp time
+                        print('***Something went wrong, need to retry getting NTP***')
 
             elif words[1] == "Current":
                 firmwaresig = str(words[4]) + str(words[5])
@@ -345,7 +353,7 @@ def parseEggData(thisEgg, words):
                 logging.info(csvdate + ' ' + str(words[2]))
                 datarowsread += 1
                 print('Debug! datarows - ' + str(datarowsread) )
-                if datarowsread >= 2:
+                if datarowsread >= 3:
                     datarowsread = 0
                     return 'done'
 
@@ -452,8 +460,8 @@ def readserial(ser, numlines):
             print 'Debug! just got done with ESP8266 update, restart and redo ntp'
         elif parsereturn == 'blank':
             blankcount = blankcount + 1
-            if blankcount > 4:
-                print('Debug! waited too long, continuing')
+            if blankcount > 7:
+                print('Debug! more than a minute has passed, continuing')
                 readmore = False
             else:
                 print('Debug! = waiting... ' + str(blankcount) + '0 seconds')
@@ -470,6 +478,43 @@ def readserial(ser, numlines):
             print 'read in ' + str(numlines) + ' lines'
         else:
            pass
+
+def readuntilblank(ser):
+    parsereturn = ''
+    blankcount = 0
+    readcount = 0
+    readmore = True
+    while readmore:
+        rcv1 = ""
+        rcv1 = ser.readline()
+        words = rcv1.split()
+        parsereturn = parseEggData(thisEgg, words)
+        if parsereturn == 'done':
+            print 'Debug! we are all done reading'
+            blankcount = 0
+            readmore = False
+        #elif parsereturn == 'espupd':
+        #    print 'Debug! just got done with ESP8266 update, restart and redo ntp'
+        elif parsereturn == 'blank':
+            blankcount = blankcount + 1
+            if blankcount > 0:
+                print('that is our first blankline, we are done.')
+                readmore = False
+            else:
+                print('Debug! = waiting... ' + str(blankcount) + '0 seconds')
+
+        else:
+            #print('(' + str(readcount) + ') ' + rcv1 + ' ' + str(numlines))
+            print('(' + str(readcount) + ') ' + rcv1)
+            blankcount = 0
+        readcount = readcount + 1
+        #if (readcount > numlines):
+        #    readcount = 0
+        #    readmore = False
+        #    print 'finished reading...'
+        #    print 'read in ' + str(numlines) + ' lines'
+        #else:
+        #   pass
 
 def cmd (ser, cmdlist):
     for cmd in cmdlist:
@@ -521,12 +566,12 @@ def getsettings(ser):
 def setrtcwithntp(ser):
     processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off ' + tz_off + '\n', 'backup tz\n', 'ssid '+ ssidstring +'\n', 'pwd '+ ssidpwd +'\n', 'exit\n'])
     #processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off ' + tz_off + '\n', 'backup tz\n', 'ssid Acknet\n', 'pwd millicat75\n', 'exit\n'])
-    time.sleep(1)
+    time.sleep(3)
     thisEgg.rtctest()
     logging.info ("restarting...")
-    readserial(ser, 75)
-    ser.close()  # In case the port is already open this closes it.
-    ser.open()   # Reopen the port.
+    readserial(ser, 77)
+    #ser.close()  # In case the port is already open this closes it.
+    #ser.open()   # Reopen the port.
 
 
 def setmqttsrv(ser):
@@ -539,9 +584,10 @@ def clearsd(ser):
         logging.info ("reading files on SD card...")
         thisEgg.filelist = []
         processcmd = cmd(ser, ['list files\n'])
+        time.sleep(3)
         # need a new way to count files and determine when reading is complete
         # technically, count files until first blank line would do it if we took local control here
-        readserial(ser, 20)
+        readuntilblank(ser);
 
         print('here is the file list - ')
         print (thisEgg.filelist)
@@ -666,13 +712,14 @@ def main():
         ser.close()  # In case the port is already open this closes it.
         ser.open()   # Reopen the port.
 
-        logging.debug ("reconnecting to port " + eggComPort)
+        print("reconnecting to port " + eggComPort)
         time.sleep(3)
 
 
         logging.info('setting offline mode...')
         processcmd = cmd(ser, ['aqe\n'])
-        time.sleep(1)
+        readserial(ser, 95)
+        time.sleep(3)
         clearsd(ser)
         time.sleep(1)
         processcmd = cmd(ser, ['restore defaults\n'])
