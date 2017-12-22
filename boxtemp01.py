@@ -664,7 +664,8 @@ def main():
                 #note- as soon as any egg is found, loop ends.
                 eggCount = eggCount + 1
 
-            if portcount == totalPorts-1:
+            # this logic never gets used
+            if eggCount == totalPorts-1:
                 if eggNotFound:
                     print "egg not found!"
                     time.sleep(.5)
@@ -726,7 +727,7 @@ def main():
         time.sleep(1)
         processcmd = cmd(ser, ['restore defaults\n'])
         time.sleep(2)
-        processcmd = cmd(ser, ['opmode offline\n', 'exit\n'])
+        processcmd = cmd(ser, ['opmode offline\n', 'softap disable\n', 'exit\n'])
         offlinemode = True
         logging.info ("restarting...")
         ser.close()  # In case the port is already open this closes it.
