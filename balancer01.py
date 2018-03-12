@@ -773,7 +773,7 @@ def main():
     return
 
 
-root = Tk()
-helv36 = tkFont.Font(family='Helvetica', size=9, weight='bold')
-app = App(root)
-root.mainloop()
+#root = Tk()
+#helv36 = tkFont.Font(family='Helvetica', size=9, weight='bold')
+#app = App(root)
+#root.mainloop()
