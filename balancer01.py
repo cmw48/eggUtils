@@ -686,92 +686,96 @@ def main():
         time.sleep(1)  # pause before looping again-  check ports again in 2 seconds
     time.sleep(2)  # Gives user 2 seconds to view Port information
 
-    # Set Port
-    ser = serial.Serial(eggComPort, 115200, timeout=10) # Put in your speed and timeout value.
-    ser.close()  # In case the port is already open this closes it.
-    ser.open()   # Reopen the port.
+    eggs = 0
+    while egg < len(eggComPorts)
+        thisPort = eggComPorts(egg)
 
-    ser.flushInput()
-    ser.flushOutput()
-    print "connected to port " + eggComPort
-
-    getconfigmode(ser)
-    getsettings(ser)
-    thisEgg.passeggtests()
-
-    if app.appmode == 'RTC':
-        logging.info ("setting NTP time...")
-        # send RTC / NTP commands and reset
-        setrtcwithntp(ser)
-        # verify rtc set
-
-        # restart
-        #  are there esp reload issues?
-          #Info: ESP8266 Firmware Version is up to date
-        #  watch for online data transmit via mqtt
-        # set opmode offline and exit
-        # verify offline data collection to sd card
-        # restart
-        # list files
-        # download files
-        # verify they look okay
-        # delete files from sd
-        # restore defaults, opmode offline, exit
-        #readserial(ser, 90)
+        # Set Port
+        ser = serial.Serial(thisPort, 115200, timeout=10) # Put in your speed and timeout value.
         ser.close()  # In case the port is already open this closes it.
         ser.open()   # Reopen the port.
 
-        print("reconnecting to port " + eggComPort)
-        time.sleep(2)
+        ser.flushInput()
+        ser.flushOutput()
+        print "connected to port " + thisPort
 
+        getconfigmode(ser)
+        getsettings(ser)
+        # #thisEgg.passeggtests()
+        # #-- comment this block --#
+        # if app.appmode == 'RTC':
+        #     logging.info ("setting NTP time...")
+        #     # send RTC / NTP commands and reset
+        #     setrtcwithntp(ser)
+        #     # verify rtc set
+        #
+        #     # restart
+        #     #  are there esp reload issues?
+        #       #Info: ESP8266 Firmware Version is up to date
+        #     #  watch for online data transmit via mqtt
+        #     # set opmode offline and exit
+        #     # verify offline data collection to sd card
+        #     # restart
+        #     # list files
+        #     # download files
+        #     # verify they look okay
+        #     # delete files from sd
+        #     # restore defaults, opmode offline, exit
+        #     #readserial(ser, 90)
+        #     ser.close()  # In case the port is already open this closes it.
+        #     ser.open()   # Reopen the port.
+        #
+        #     print("reconnecting to port " + thisPort)
+        #     time.sleep(2)
+        #
+        #
+        #     logging.info('setting offline mode...')
+        #     processcmd = cmd(ser, ['aqe\n'])
+        #     readserial(ser, 95)
+        #     time.sleep(2)
+        #     clearsd(ser)
+        #     time.sleep(1)
+        #     processcmd = cmd(ser, ['restore defaults\n'])
+        #     time.sleep(2)
+        #     processcmd = cmd(ser, ['opmode offline\n', 'exit\n'])
+        #     offlinemode = True
+        #     logging.info ("restarting...")
+        #     ser.close()  # In case the port is already open this closes it.
+        #     ser.open()   # Reopen the port.
+        #     readserial(ser, 40)
+        #     logging.info ("restarting...")
+        #     ser.close()  # In case the port is already open this closes it.
+        #     ser.open()   # Reopen the port.
+        #     logging.debug ("reconnecting to port " + eggComPort)
+        #     time.sleep(2)
+        #     logging.info ("reading files on SD card...")
+        #     processcmd = cmd(ser, ['aqe\n'])
+        #     time.sleep(1)
+        #     thisEgg.filelist = []
+        #     processcmd = cmd(ser, ['list files\n'])
+        #     readserial(ser, 97)
+        #     if len(thisEgg.filelist) == 0:
+        #         print('No files to download.  FAIL')
+        #         logging.info('No files to download.  FAIL')
+        #         thisEgg.dlfile = False
+        #     else:
+        #         processcmd = cmd(ser, ['download ' + str(thisEgg.filelist[lastfile]) + '\n'])
+        #         readserial(ser, 100)
+        #         logging.debug ('Finished downloading...')
+        #         thisEgg.dlfile = True
+        #     clearsd(ser)
+        #     logging.debug('deleted all csv files from SD...')
+        #     thisEgg.finaltest()
+        #     logging.info('***************************************')
+        #     logging.info(' ')
+        #     logging.info(' ')
+        # elif app.appmode == 'MQTT':
+        #     logging.info ("setting mqttsrv...")
+        #     setmqttsrv(ser)
+        # else:
+        #     print('Unknown appmode.')
 
-        logging.info('setting offline mode...')
-        processcmd = cmd(ser, ['aqe\n'])
-        readserial(ser, 95)
-        time.sleep(2)
-        clearsd(ser)
-        time.sleep(1)
-        processcmd = cmd(ser, ['restore defaults\n'])
-        time.sleep(2)
-        processcmd = cmd(ser, ['opmode offline\n', 'exit\n'])
-        offlinemode = True
-        logging.info ("restarting...")
-        ser.close()  # In case the port is already open this closes it.
-        ser.open()   # Reopen the port.
-        readserial(ser, 40)
-        logging.info ("restarting...")
-        ser.close()  # In case the port is already open this closes it.
-        ser.open()   # Reopen the port.
-        logging.debug ("reconnecting to port " + eggComPort)
-        time.sleep(2)
-        logging.info ("reading files on SD card...")
-        processcmd = cmd(ser, ['aqe\n'])
-        time.sleep(1)
-        thisEgg.filelist = []
-        processcmd = cmd(ser, ['list files\n'])
-        readserial(ser, 97)
-        if len(thisEgg.filelist) == 0:
-            print('No files to download.  FAIL')
-            logging.info('No files to download.  FAIL')
-            thisEgg.dlfile = False
-        else:
-            processcmd = cmd(ser, ['download ' + str(thisEgg.filelist[lastfile]) + '\n'])
-            readserial(ser, 100)
-            logging.debug ('Finished downloading...')
-            thisEgg.dlfile = True
-        clearsd(ser)
-        logging.debug('deleted all csv files from SD...')
-        thisEgg.finaltest()
-        logging.info('***************************************')
-        logging.info(' ')
-        logging.info(' ')
-    elif app.appmode == 'MQTT':
-        logging.info ("setting mqttsrv...")
-        setmqttsrv(ser)
-    else:
-        print('Unknown appmode.')
-
-
+        egg = egg + 1
 
 
 
