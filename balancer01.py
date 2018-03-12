@@ -687,8 +687,9 @@ def main():
     time.sleep(2)  # Gives user 2 seconds to view Port information
 
     egg = 0
+    thisPort = ""
     while egg < len(eggComPorts):
-        thisPort = eggComPorts(egg)
+        thisPort = eggComPorts[egg]
 
         # Set Port
         ser = serial.Serial(thisPort, 115200, timeout=10) # Put in your speed and timeout value.
