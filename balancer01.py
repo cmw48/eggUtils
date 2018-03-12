@@ -664,16 +664,15 @@ def main():
                 if "/dev/ttyUSB" in openComPort:
                     print "there is an egg on " + openComPort
                     eggComPorts.append('openComPort')
+                    print "Found AQE on " + eggComPort
+                    eggNotFound = False
+                    #note- as soon as any egg is found, loop ends.
+                    eggCount = eggCount + 1
                 else:
                     print openComPort + "is not an egg."
 
-                print "Found AQE on " + eggComPort
-                eggNotFound = False
-                #note- as soon as any egg is found, loop ends.
-                eggCount = eggCount + 1
-
             if portcount == totalPorts-1:
-                if eggNotFound:
+                if eggCount == 0:
                     print "egg not found!"
                     time.sleep(.5)
                 else:
