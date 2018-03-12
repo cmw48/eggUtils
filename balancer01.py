@@ -663,7 +663,7 @@ def main():
                 openComPort = p[0]
                 if "/dev/ttyUSB" in openComPort:
                     print "there is an egg on " + openComPort
-                    eggComPorts.append('openComPort')
+                    eggComPorts.append(openComPort)
                     print "Found AQE on " + eggComPort
                     eggNotFound = False
                     #note- as soon as any egg is found, loop ends.
