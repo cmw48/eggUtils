@@ -633,7 +633,9 @@ def main():
     totalPorts = 0
     portcount = 0
     eggComPort = ""
+    eggComPorts = []
     eggCount = 0
+    openComPort = ""
     processcmd = ""
     eggNotFound = True
     global offlinemode
@@ -657,8 +659,14 @@ def main():
                 eggCount = eggCount + 1
 
             if "USB VID:PID" in p[2]:  # Looks for "PID" in P[2].
-                print "LINUX! there is an air quality egg on " + p[0]
-                eggComPort = p[0]
+                print "LINUX! there is an open com port on " + p[0]
+                openComPort = p[0]
+                if "/dev/ttyUSB" in openComPort:
+                    print "there is an egg on " + openComPort
+                    eggComPorts.append('openComPort')
+                else:
+                    print openComPort + "is not an egg."
+
                 print "Found AQE on " + eggComPort
                 eggNotFound = False
                 #note- as soon as any egg is found, loop ends.
@@ -773,7 +781,7 @@ def main():
     return
 
 
-#root = Tk()
-#helv36 = tkFont.Font(family='Helvetica', size=9, weight='bold')
-#app = App(root)
-#root.mainloop()
+root = Tk()
+helv36 = tkFont.Font(family='Helvetica', size=9, weight='bold')
+app = App(root)
+root.mainloop()
