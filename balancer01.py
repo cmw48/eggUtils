@@ -680,13 +680,13 @@ def main():
 
                     portcount = totalPorts  #kick out of this while loop and read ports again
 
-                sys.exit() # Terminates Script.
+                #sys.exit() # Terminates Script.
             portcount = portcount + 1
 
         time.sleep(1)  # pause before looping again-  check ports again in 2 seconds
     time.sleep(2)  # Gives user 2 seconds to view Port information
 
-    eggs = 0
+    egg = 0
     while egg < len(eggComPorts):
         thisPort = eggComPorts(egg)
 
