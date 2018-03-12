@@ -687,7 +687,7 @@ def main():
     time.sleep(2)  # Gives user 2 seconds to view Port information
 
     eggs = 0
-    while egg < len(eggComPorts)
+    while egg < len(eggComPorts):
         thisPort = eggComPorts(egg)
 
         # Set Port
