@@ -537,7 +537,7 @@ def readuntilblank(ser):
         #else:
         #   pass
 
-def cmd (ser, cmdlist):
+def cmd(ser, cmdlist):
     for cmd in cmdlist:
         ser.write(cmd)
         print cmd
