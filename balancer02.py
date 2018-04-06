@@ -540,7 +540,7 @@ def readuntilblank(ser):
 def cmd (ser, cmdlist):
     for cmd in cmdlist:
         ser.write(cmd)
-        #print cmd
+        print cmd
         time.sleep(1)
     return 'command list processed...'
 
