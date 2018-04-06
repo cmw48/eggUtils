@@ -797,13 +797,15 @@ def main():
         #     setmqttsrv(ser)
         # else:
         #     print('Unknown appmode.')
-
+        print(thisEgg.eggserial)
         if thisEgg.eggserial == 'egg0080442a8b980123':
+            print('made it')
             newtempoff = '1.04'
             newhumoff = '1.16'
             processcmd = cmd(ser, ['temp_off ' + newtempoff + '\n', 'hum_off ' + newhumoff + '\n', 'backup all\n', 'opmode normal\n', 'softap disable\n','ssid '+ ssidstring +'\n', 'pwd '+ ssidpwd +'\n', 'exit\n'])
             #processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off -4\n', 'backup tz\n', 'ssid Acknet\n', 'pwd millicat75\n', 'exit\n'])
             time.sleep(3)
+        print('it is all over')
         geteggdata(ser)
         egg = egg + 1
 
