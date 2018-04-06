@@ -31,25 +31,25 @@ class App:
                              command=self.end_program)
         self.button.pack(side=LEFT)
         self.mode_mqtt = Button(frame,
-                             text="set MQTT to\n" + host,
+                             text="BALANCE ALL EGGS\n" + host,
                              height=10, width=30, font=helv36,
                              command=self.run_program)
         self.mode_mqtt.pack(side=LEFT)
         self.mode_setrtc = Button(frame,
-                             text="RTC load",  font=helv36,
+                             text="Discover All Eggs",  font=helv36,
                              height=10, width=30,
-                             command=self.rtc_mode)
+                             command=self.disc_mode)
         self.mode_setrtc.pack(side=LEFT)
 
     def run_program(self):
-        print("setting mqttsrv!")
-        self.appmode = 'MQTT'
+        print("TempHum balancing in progress!")
+        self.appmode = 'BALANCE'
         if __name__ == "__main__":
             main()
 
-    def rtc_mode(self):
-        print("Running RTC mode!")
-        self.appmode = 'RTC'
+    def disc_mode(self):
+        print("Running Discover mode!")
+        self.appmode = 'DISCOVER'
         if __name__ == "__main__":
             main()
 
@@ -79,6 +79,7 @@ class Egg:
         self.co2value = 0.0
         self.firmsig = ''
         self.ntpok = False
+        self.opmode = 'unknown'
         self.firstread = []
         self.macaddr = ''
         self.mqtthost = ''
@@ -93,8 +94,13 @@ class Egg:
         self.filelist = []
 
     def introduce(self):
-        print('eggserial {1}, eggtype {2}, firmware version {3}'.format(self, self.eggserial, self.eggtype, self.eggversion))
-        logging.info('eggserial {1}, eggtype {2}, firmware version {3}'.format(self, self.eggserial, self.eggtype, self.eggversion))
+        print('serial {1}, type {2}, firmware ver {3}, op {4}'.format(self, self.eggserial, self.eggtype, self.eggversion, self.opmode))
+        logging.info('serial {1}, type {2}, firmware ver {3}, op {4}'.format(self, self.eggserial, self.eggtype, self.eggversion, self.opmode))
+
+    def getoffsets(self):
+        print('temp offset {1}, hum offset {2}, tz offset {3}'.format(self, self.tempoff, self.humoff, self.tzoff))
+        logging.info('temp offset {1}, hum offset {2}, tz offset {3}'.format(self, self.tempoff, self.humoff, self.tzoff))
+
 
     def passeggtests(self):
         print('wdpass {1}, slotpass {2},  spipass {3}, sdpass {4}, sht25pass {5}, rtcpass {6}, esppass {7} '.format(self, self.wdpass, self.slotpass, self.spipass, self.sdpass, self.sht25pass, self.rtcpass, self.esppass))
@@ -208,8 +214,8 @@ def parseEggData(thisEgg, words):
     global datarowsread
     global offlinemode
     filelist = []
-    #print 'debug! number of words ' + str(numwords)
-
+    #print(words)
+    #print('debug! number of words ' + str(numwords))
 
     if numwords > 3:
         try:
@@ -384,10 +390,20 @@ def parseEggData(thisEgg, words):
                 thisEgg.firstread = firstread
                 thisEgg.uploadok = True
 
+            elif words[0] == 'Operational':
+                if words[2]  == 'Normal':
+                    thisEgg.opmode = "normal"
+                elif words[2] == 'Offline':
+                    thisEgg.opmode = "offline"
+                print(thisEgg.opmode)
+
+
+
             elif words[1] == 'Done':
                 if words[2]  == 'downloading.':
                 #    print 'Debug!  Download finished.'
                     return 'done'
+
 
             else:
                 pass
@@ -453,6 +469,8 @@ def readserial(ser, numlines):
         rcv1 = ""
         rcv1 = ser.readline()
         words = rcv1.split()
+        settings = rcv1.split(":")
+        #print(settings)
         parsereturn = parseEggData(thisEgg, words)
         if parsereturn == 'done':
             print 'Debug! we are all done reading'
@@ -466,18 +484,19 @@ def readserial(ser, numlines):
                 print('Debug! more than a minute has passed, continuing')
                 readmore = False
             else:
-                print('Debug! = waiting... ' + str(blankcount) + '0 seconds')
+                pass
+                #print('Debug! = waiting... ' + str(blankcount) + '0 seconds')
 
         else:
             #print('(' + str(readcount) + ') ' + rcv1 + ' ' + str(numlines))
-            print('(' + str(readcount) + ') ' + rcv1)
+            #print('(' + str(readcount) + ') ' + rcv1)
             blankcount = 0
         readcount = readcount + 1
         if (readcount > numlines):
             readcount = 0
             readmore = False
-            print 'finished reading...'
-            print 'read in ' + str(numlines) + ' lines'
+            #print 'finished reading...'
+            #print 'read in ' + str(numlines) + ' lines'
         else:
            pass
 
@@ -507,7 +526,7 @@ def readuntilblank(ser):
 
         else:
             #print('(' + str(readcount) + ') ' + rcv1 + ' ' + str(numlines))
-            print('(' + str(readcount) + ') ' + rcv1)
+            #print('(' + str(readcount) + ') ' + rcv1)
             blankcount = 0
         readcount = readcount + 1
         #if (readcount > numlines):
@@ -521,10 +540,13 @@ def readuntilblank(ser):
 def cmd (ser, cmdlist):
     for cmd in cmdlist:
         ser.write(cmd)
-        print cmd
+        #print cmd
         time.sleep(1)
     return 'command list processed...'
 
+def geteggdata(ser):
+    thisEgg.introduce()
+    thisEgg.getoffsets()
 
 def getconfigmode(ser):
     processcmd = ''
@@ -535,7 +557,7 @@ def getconfigmode(ser):
     time.sleep(1)
     #get just enough of header to determine egg type
     readserial(ser, 6)
-    thisEgg.introduce()
+    #thisEgg.introduce()
     if thisEgg.eggtype == 'CO2':
         #immediately read 10 more lines
         readserial(ser, 10)
@@ -555,8 +577,8 @@ def getsettings(ser):
         print('Particulate egg...')
         readserial(ser, 73)
     else:
-        print (thisEgg.eggtype)
-        readserial(ser, 99)
+        #print (thisEgg.eggtype)
+        readserial(ser, 88)
 
     # CO2 egg displays 75 lines after AQE
     #readserial(ser, 75)
@@ -775,9 +797,12 @@ def main():
         #     setmqttsrv(ser)
         # else:
         #     print('Unknown appmode.')
-
+        geteggdata(ser)
         egg = egg + 1
 
+        ser.close()  # In case the port is already open this closes it.
+        ser.open()   # Reopen the port.
+        ser.close()  # In case the port is already open this closes it.
 
 
 
