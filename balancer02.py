@@ -547,11 +547,11 @@ def cmd(ser, cmdlist):
         readserial(ser, 1)
     return 'command list processed...'
 
-def geteggdata(ser):
+def geteggdata(thisEgg, ser):
     thisEgg.introduce()
     thisEgg.getoffsets()
 
-def getconfigmode(ser):
+def getconfigmode(thisEgg, ser):
     processcmd = ''
     ser.close()  # In case the port is already open this closes it.
     ser.open()   # Reopen the port.
@@ -569,7 +569,7 @@ def getconfigmode(ser):
         readserial(ser, 13)
     time.sleep(4)
 
-def getsettings(ser):
+def getsettings(thisEgg, ser):
     if thisEgg.eggtype == 'CO2':
         print('CO2 egg...')
         readserial(ser, 77)
@@ -590,7 +590,7 @@ def getsettings(ser):
     #readserial(ser, 99)
     time.sleep(1)
 
-def setrtcwithntp(ser):
+def setrtcwithntp(thisEgg, ser):
     processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off ' + tz_off + '\n', 'backup tz\n', 'ssid '+ ssidstring +'\n', 'pwd '+ ssidpwd +'\n', 'exit\n'])
     #processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off ' + tz_off + '\n', 'backup tz\n', 'ssid Acknet\n', 'pwd millicat75\n', 'exit\n'])
     time.sleep(3)
@@ -606,7 +606,7 @@ def setmqttsrv(ser):
     #processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off -4\n', 'backup tz\n', 'ssid Acknet\n', 'pwd millicat75\n', 'exit\n'])
     time.sleep(3)
 
-def clearsd(ser):
+def clearsd(thisEgg, ser):
         batchlist = []
         logging.info ("reading files on SD card...")
         thisEgg.filelist = []
@@ -732,8 +732,8 @@ def main():
           ser.flushOutput()
           print "connected to port " + thisPort
 
-          getconfigmode(ser)
-          getsettings(ser)
+          getconfigmode(thisEgg, ser)
+          getsettings(thisEgg, ser)
           # #thisEgg.passeggtests()
           # #-- comment this block --#
           # if app.appmode == 'RTC':
@@ -816,8 +816,8 @@ def main():
             #processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off -4\n', 'backup tz\n', 'ssid Acknet\n', 'pwd millicat75\n', 'exit\n'])
             time.sleep(3)
             print('egg updated')
-            getconfigmode(ser)
-            getsettings(ser)
+            getconfigmode(thisEgg, ser)
+            getsettings(thisEgg, ser)
           print('finished with com port ' + eggComPorts[egg])
           geteggdata(ser)
           egg = egg + 1
