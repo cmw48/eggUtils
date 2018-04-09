@@ -205,7 +205,7 @@ class Egg:
             print ('FAIL - egg failed at least one test above.  Try running tests again.')
             logging.info  ('FAIL - egg failed at least one test above.  Try running tests again.')
 
-thisEgg = Egg()
+
 
 lastfile = 0
 
@@ -717,6 +717,7 @@ def main():
     thisPort = ""
     while egg < len(eggComPorts):
         thisPort = eggComPorts[egg]
+        thisEgg = Egg()
 
         # Set Port
         try:
@@ -833,8 +834,8 @@ def main():
     print('That is all the com ports there are.\n')
 
     print egglist
-    for rocklobstah in egglist:
-        print('the rockID is :' + rocklobstah.eggserial)
+    for rock in egglist:
+        print('the rockID is :' + rock.eggserial)
 
     print('***CLICK A BUTTON TO RUN AGAIN***')
     return
