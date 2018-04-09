@@ -728,7 +728,6 @@ def main():
           ser = serial.Serial(thisPort, 115200, timeout=10) # Put in your speed and timeout value.
           ser.close()  # In case the port is already open this closes it.
           ser.open()   # Reopen the port.
-                    print('created object')
 
           ser.flushInput()
           ser.flushOutput()
