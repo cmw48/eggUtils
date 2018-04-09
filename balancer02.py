@@ -654,7 +654,7 @@ def main():
 
 
     print 'initializing appmode ' + app.appmode + '...'
-    thisEgg = Egg()
+    thisEgg = {}
     serPort = ""
     totalPorts = 0
     portcount = 0
@@ -719,10 +719,11 @@ def main():
     thisPort = ""
     while egg < len(eggComPorts):
         thisPort = eggComPorts[egg]
-        thisEgg = Egg()
+
 
         # Set Port
         try:
+          thisEgg = Egg()
           ser = serial.Serial(thisPort, 115200, timeout=10) # Put in your speed and timeout value.
           ser.close()  # In case the port is already open this closes it.
           ser.open()   # Reopen the port.
