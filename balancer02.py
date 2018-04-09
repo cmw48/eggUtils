@@ -807,7 +807,7 @@ def main():
           if thisEgg.eggserial == 'egg008045060d9b0120':
             print('made it')
             newtempoff = '0.65'
-            newhumoff = '0.69'
+            newhumoff = '0.68'
             processcmd = cmd(ser, ['temp_off ' + newtempoff + '\n', 'hum_off ' + newhumoff + '\n', 'backup all\n', 'opmode normal\n', 'softap disable\n','ssid '+ ssidstring +'\n', 'pwd '+ ssidpwd +'\n', 'exit\n'])
             #processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off -4\n', 'backup tz\n', 'ssid Acknet\n', 'pwd millicat75\n', 'exit\n'])
             time.sleep(3)
@@ -831,8 +831,10 @@ def main():
             egg = egg + 1
     print('That is all the com ports there are.\n')
 
-    for rock in egglist:
-        print('the rockID is :' + rock.eggserial)
+    print egglist
+    for rocklobstah in egglist:
+        print('the rockID is :' + rocklobstah.eggserial)
+
     print('***CLICK A BUTTON TO RUN AGAIN***')
     return
 
