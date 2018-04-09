@@ -808,6 +808,7 @@ def main():
             #processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off -4\n', 'backup tz\n', 'ssid Acknet\n', 'pwd millicat75\n', 'exit\n'])
             time.sleep(3)
             print('egg updated')
+            getconfigmode(ser)
             getsettings(ser)
         print('finished with com port ' + eggComPorts[egg])
         geteggdata(ser)
