@@ -818,6 +818,7 @@ def main():
           geteggdata(ser)
           egg = egg + 1
           egglist.append(thisEgg)
+          print egglist
 
           ser.close()  # In case the port is already open this closes it.
           ser.open()   # Reopen the port.
