@@ -820,7 +820,7 @@ def main():
             getconfigmode(thisEgg, ser)
             getsettings(thisEgg, ser)
           print('finished with com port ' + eggComPorts[egg])
-          geteggdata(ser)
+          geteggdata(thisEgg, ser)
           egg = egg + 1
           egglist.append(thisEgg)
           print egglist
