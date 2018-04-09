@@ -542,6 +542,7 @@ def cmd(ser, cmdlist):
         ser.write(cmd)
         print cmd
         time.sleep(1)
+        readserial(ser, 1)
     return 'command list processed...'
 
 def geteggdata(ser):
@@ -807,6 +808,7 @@ def main():
             #processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off -4\n', 'backup tz\n', 'ssid Acknet\n', 'pwd millicat75\n', 'exit\n'])
             time.sleep(3)
             print('egg updated')
+            getsettings(ser)
         print('finished with com port ' + eggComPorts[egg])
         geteggdata(ser)
         egg = egg + 1
