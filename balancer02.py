@@ -462,7 +462,7 @@ def parseEggData(thisEgg, words):
             print traceback.format_exc()
 
 
-def readserial(ser, numlines):
+def readserial(thisEgg, ser, numlines):
     parsereturn = ''
     blankcount = 0
     readcount = 0
@@ -544,7 +544,7 @@ def cmd(ser, cmdlist):
         ser.write(cmd)
         print cmd
         time.sleep(1)
-        readserial(ser, 1)
+        (ser, 1)
     return 'command list processed...'
 
 def geteggdata(thisEgg, ser):
@@ -559,35 +559,35 @@ def getconfigmode(thisEgg, ser):
     processcmd = cmd(ser, ['aqe\n'])
     time.sleep(1)
     #get just enough of header to determine egg type
-    readserial(ser, 6)
+    readserial(thisEgg, ser, 6)
     #thisEgg.introduce()
     if thisEgg.eggtype == 'CO2':
         #immediately read 10 more lines
-        readserial(ser, 10)
+        readserial(thisEgg, ser, 10)
     else:
         #gas egg, immediately read 15 more lines
-        readserial(ser, 13)
+        readserial(thisEgg, ser, 13)
     time.sleep(4)
 
 def getsettings(thisEgg, ser):
     if thisEgg.eggtype == 'CO2':
         print('CO2 egg...')
-        readserial(ser, 77)
+        readserial(thisEgg, ser, 77)
     elif thisEgg.eggtype == 'VOC':
         print('VOC egg...')
-        readserial(ser, 88)
+        readserial(thisEgg, ser, 88)
     elif thisEgg.eggtype == 'Particulate':
         print('Particulate egg...')
-        readserial(ser, 73)
+        readserial(thisEgg, ser, 73)
     else:
         #print (thisEgg.eggtype)
-        readserial(ser, 88)
+        readserial(thisEgg, ser, 88)
 
     # CO2 egg displays 75 lines after AQE
-    #readserial(ser, 75)
+    #readserial(thisEgg, ser, 75)
 
     # gas egg displays 99 lines after AQE
-    #readserial(ser, 99)
+    #readserial(thisEgg, ser, 99)
     time.sleep(1)
 
 def setrtcwithntp(thisEgg, ser):
@@ -596,7 +596,7 @@ def setrtcwithntp(thisEgg, ser):
     time.sleep(3)
     thisEgg.rtctest()
     logging.info ("restarting...")
-    readserial(ser, 77)
+    readserial(thisEgg, ser, 77)
     #ser.close()  # In case the port is already open this closes it.
     #ser.open()   # Reopen the port.
 
@@ -724,9 +724,11 @@ def main():
         # Set Port
         try:
           thisEgg = Egg()
+          print('created object')
           ser = serial.Serial(thisPort, 115200, timeout=10) # Put in your speed and timeout value.
           ser.close()  # In case the port is already open this closes it.
           ser.open()   # Reopen the port.
+                    print('created object')
 
           ser.flushInput()
           ser.flushOutput()
@@ -754,7 +756,7 @@ def main():
           #     # verify they look okay
           #     # delete files from sd
           #     # restore defaults, opmode offline, exit
-          #     #readserial(ser, 90)
+          #     #readserial(thisEgg, ser, 90)
           #     ser.close()  # In case the port is already open this closes it.
           #     ser.open()   # Reopen the port.
           #
@@ -764,7 +766,7 @@ def main():
           #
           #     logging.info('setting offline mode...')
           #     processcmd = cmd(ser, ['aqe\n'])
-          #     readserial(ser, 95)
+          #     readserial(thisEgg, ser, 95)
           #     time.sleep(2)
           #     clearsd(ser)
           #     time.sleep(1)
@@ -775,7 +777,7 @@ def main():
           #     logging.info ("restarting...")
           #     ser.close()  # In case the port is already open this closes it.
           #     ser.open()   # Reopen the port.
-          #     readserial(ser, 40)
+          #     readserial(thisEgg, ser, 40)
           #     logging.info ("restarting...")
           #     ser.close()  # In case the port is already open this closes it.
           #     ser.open()   # Reopen the port.
@@ -786,14 +788,14 @@ def main():
           #     time.sleep(1)
           #     thisEgg.filelist = []
           #     processcmd = cmd(ser, ['list files\n'])
-          #     readserial(ser, 97)
+          #     readserial(thisEgg, ser, 97)
           #     if len(thisEgg.filelist) == 0:
           #         print('No files to download.  FAIL')
           #         logging.info('No files to download.  FAIL')
           #         thisEgg.dlfile = False
           #     else:
           #         processcmd = cmd(ser, ['download ' + str(thisEgg.filelist[lastfile]) + '\n'])
-          #         readserial(ser, 100)
+          #         readserial(thisEgg, ser, 100)
           #         logging.debug ('Finished downloading...')
           #         thisEgg.dlfile = True
           #     clearsd(ser)
