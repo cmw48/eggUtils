@@ -707,7 +707,8 @@ def main():
 
         time.sleep(1)  # pause before looping again-  check ports again in 2 seconds
     time.sleep(2)  # Gives user 2 seconds to view Port information
-
+    print(eggComPorts)
+    print("There is your list")
     egg = 0
     thisPort = ""
     while egg < len(eggComPorts):
@@ -798,14 +799,15 @@ def main():
         # else:
         #     print('Unknown appmode.')
         print(thisEgg.eggserial)
-        if thisEgg.eggserial == 'egg0080442a8b980123':
+        if thisEgg.eggserial == 'egg008045060d9b0120':
             print('made it')
-            newtempoff = '1.04'
-            newhumoff = '1.16'
+            newtempoff = '0.65'
+            newhumoff = '0.69'
             processcmd = cmd(ser, ['temp_off ' + newtempoff + '\n', 'hum_off ' + newhumoff + '\n', 'backup all\n', 'opmode normal\n', 'softap disable\n','ssid '+ ssidstring +'\n', 'pwd '+ ssidpwd +'\n', 'exit\n'])
             #processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off -4\n', 'backup tz\n', 'ssid Acknet\n', 'pwd millicat75\n', 'exit\n'])
             time.sleep(3)
-        print('it is all over')
+            print('egg updated')
+        print('finished with com port ' + eggComPorts[egg])
         geteggdata(ser)
         egg = egg + 1
 
