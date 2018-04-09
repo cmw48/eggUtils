@@ -654,6 +654,7 @@ def main():
 
 
     print 'initializing appmode ' + app.appmode + '...'
+    thisEgg = Egg()
     serPort = ""
     totalPorts = 0
     portcount = 0
@@ -664,6 +665,7 @@ def main():
     processcmd = ""
     eggNotFound = True
     egglist = []
+    #why is this global
     global offlinemode
     while eggNotFound:
 
@@ -826,7 +828,7 @@ def main():
           ser.close()  # In case the port is already open this closes it.
         except Exception as err:
             print(err)
-   
+
             if err.errno == 16:
               print("Could not open com port " + thisPort +".  Is it open in another application?")
             else:
