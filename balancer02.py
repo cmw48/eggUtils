@@ -739,8 +739,6 @@ def main():
           print "connected to port " + thisPort
 
           getconfigmode(thisEgg, ser)
-          print('holding again...')
-          time.sleep(2)
           getsettings(thisEgg, ser)
           # #thisEgg.passeggtests()
           # #-- comment this block --#
