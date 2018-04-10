@@ -7,6 +7,7 @@ import traceback
 import logging
 from Tkinter import *
 import tkFont
+import gettemp
 
 # declare once
 ser = serial.Serial()
@@ -397,7 +398,7 @@ def parseEggData(thisEgg, words):
                     thisEgg.opmode = "normal"
                 elif words[2] == 'Offline':
                     thisEgg.opmode = "offline"
-                print(thisEgg.opmode)
+                print("opmode " + thisEgg.opmode)
 
 
 
@@ -490,7 +491,7 @@ def readserial(thisEgg, ser, numlines):
                 #print('Debug! = waiting... ' + str(blankcount) + '0 seconds')
 
         else:
-            #print('(' + str(readcount) + ') ' + rcv1 + ' ' + str(numlines))
+            print('(' + str(readcount) + ') ' + rcv1 + ' ' + str(numlines))
             #print('(' + str(readcount) + ') ' + rcv1)
             blankcount = 0
         readcount = readcount + 1
@@ -555,9 +556,6 @@ def getconfigmode(thisEgg, ser):
     processcmd = ''
     ser.close()  # In case the port is already open this closes it.
     ser.open()   # Reopen the port.
-    time.sleep(3)
-    processcmd = cmd(ser, ['aqe\n'])
-    time.sleep(1)
     #get just enough of header to determine egg type
     readserial(thisEgg, ser, 6)
     #thisEgg.introduce()
@@ -566,8 +564,10 @@ def getconfigmode(thisEgg, ser):
         readserial(thisEgg, ser, 10)
     else:
         #gas egg, immediately read 15 more lines
-        readserial(thisEgg, ser, 13)
-    time.sleep(4)
+        readserial(thisEgg, ser, 15)
+    time.sleep(1)
+    processcmd = cmd(ser, ['aqe\n'])
+    time.sleep(1)
 
 def getsettings(thisEgg, ser):
     if thisEgg.eggtype == 'CO2':
@@ -579,8 +579,11 @@ def getsettings(thisEgg, ser):
     elif thisEgg.eggtype == 'Particulate':
         print('Particulate egg...')
         readserial(thisEgg, ser, 73)
+    elif thisEgg.eggtype == 'NO2CO':
+        print('NO2CO egg...')
+        readserial(thisEgg, ser, 74)
     else:
-        #print (thisEgg.eggtype)
+        print ("*** " + thisEgg.eggtype + " ***")
         readserial(thisEgg, ser, 88)
 
     # CO2 egg displays 75 lines after AQE
@@ -664,9 +667,12 @@ def main():
     openComPort = ""
     processcmd = ""
     eggNotFound = True
-    egglist = []
+    eggObjectList = []
+    eggSerialList = []
+    eggtemps = {}
     #why is this global
     global offlinemode
+
     while eggNotFound:
 
         # Find Live Ports
@@ -728,12 +734,13 @@ def main():
           ser = serial.Serial(thisPort, 115200, timeout=10) # Put in your speed and timeout value.
           ser.close()  # In case the port is already open this closes it.
           ser.open()   # Reopen the port.
-
           ser.flushInput()
           ser.flushOutput()
           print "connected to port " + thisPort
 
           getconfigmode(thisEgg, ser)
+          print('holding again...')
+          time.sleep(2)
           getsettings(thisEgg, ser)
           # #thisEgg.passeggtests()
           # #-- comment this block --#
@@ -822,8 +829,8 @@ def main():
           print('finished with com port ' + eggComPorts[egg])
           geteggdata(thisEgg, ser)
           egg = egg + 1
-          egglist.append(thisEgg)
-          print egglist
+          eggObjectList.append(thisEgg)
+          print eggObjectList
 
           ser.close()  # In case the port is already open this closes it.
           ser.open()   # Reopen the port.
@@ -838,10 +845,14 @@ def main():
             egg = egg + 1
     print('That is all the com ports there are.\n')
 
-    print egglist
-    for rock in egglist:
+    print eggObjectList
+    for rock in eggObjectList:
         print('the rockID is :' + rock.eggserial)
+        eggSerialList.append(rock.eggserial)
+        print eggSerialList
 
+    eggtemps = gettemp.getEggList(eggSerialList)
+    print(eggtemps)
     print('***CLICK A BUTTON TO RUN AGAIN***')
     return
 
