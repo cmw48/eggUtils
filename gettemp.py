@@ -214,7 +214,7 @@ def main(argv):
     # eggserial = "egg00802e077f880112"
     eggserial = "egg00802294f10b0142"
     # eggserial = "egg00802fbeaf1b0130"
-    listofeggs = ['egg00802e651c1b0130']
+    listofeggs = ['egg008045060d9b0120', 'egg008044e7629b0121', 'egg0080446a8b180122', 'egg00802294f10b0142', 'egg00804507c5280120']
     username = "chris"
     #username = "wickeddevice"
     verbose = False

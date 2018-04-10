@@ -283,7 +283,7 @@ def parseEggData(thisEgg, words):
 
             elif words[1] == "Getting":
                 if words[2] == "NTP":
-                    time.sleep(3)
+                    time.sleep(2)
                     wordslen = len(words)
                     print('length of array is ' + str(wordslen))
                     if wordslen > 3:
@@ -544,8 +544,8 @@ def cmd(ser, cmdlist):
     for cmd in cmdlist:
         ser.write(cmd)
         print cmd
-        time.sleep(1)
-        (ser, 1)
+        #time.sleep(1)
+        #(ser, 1)
     return 'command list processed...'
 
 def geteggdata(thisEgg, ser):
@@ -562,12 +562,15 @@ def getconfigmode(thisEgg, ser):
     if thisEgg.eggtype == 'CO2':
         #immediately read 10 more lines
         readserial(thisEgg, ser, 10)
+    elif thisEgg.eggtype == 'Particulate':
+        #new particulate egg, read 11 more lines
+        readserial(thisEgg, ser, 11)
     else:
         #gas egg, immediately read 15 more lines
         readserial(thisEgg, ser, 15)
     time.sleep(1)
     processcmd = cmd(ser, ['aqe\n'])
-    time.sleep(1)
+
 
 def getsettings(thisEgg, ser):
     if thisEgg.eggtype == 'CO2':
@@ -591,7 +594,7 @@ def getsettings(thisEgg, ser):
 
     # gas egg displays 99 lines after AQE
     #readserial(thisEgg, ser, 99)
-    time.sleep(1)
+
 
 def setrtcwithntp(thisEgg, ser):
     processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off ' + tz_off + '\n', 'backup tz\n', 'ssid '+ ssidstring +'\n', 'pwd '+ ssidpwd +'\n', 'exit\n'])
@@ -721,10 +724,10 @@ def main():
     time.sleep(2)  # Gives user 2 seconds to view Port information
     print(eggComPorts)
     print("There is your list")
-    egg = 0
+    egg = 1
     thisPort = ""
     while egg < len(eggComPorts):
-        thisPort = eggComPorts[egg]
+        thisPort = eggComPorts[(egg-1)]
 
 
         # Set Port
@@ -820,7 +823,7 @@ def main():
             newhumoff = '0.68'
             processcmd = cmd(ser, ['temp_off ' + newtempoff + '\n', 'hum_off ' + newhumoff + '\n', 'backup all\n', 'opmode normal\n', 'softap disable\n','ssid '+ ssidstring +'\n', 'pwd '+ ssidpwd +'\n', 'exit\n'])
             #processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off -4\n', 'backup tz\n', 'ssid Acknet\n', 'pwd millicat75\n', 'exit\n'])
-            time.sleep(3)
+
             print('egg updated')
             getconfigmode(thisEgg, ser)
             getsettings(thisEgg, ser)
