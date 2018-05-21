@@ -298,8 +298,8 @@ def parseEggData(thisEgg, words):
                       ntphour = ntptime[:2]
                       timemin = timehack[3:5]
                       ntpmin = ntptime[3:5]
-                      logging.debug (timemin)
-                      logging.debug (ntpmin)
+                      print(timemin)
+                      print(ntpmin)
                       #if timehour == ntphour:  would be cool if our actual time matched the egg time
                       # have to add a +1 to timehour for DST
                       dst = 0
@@ -587,7 +587,7 @@ def getsettings(ser):
 
 def setrtcwithntp(ser):
     rtcstatus = thisEgg.rtctest()
-    processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off ' + tz_off + '\n', 'backup tz\n', 'ssid '+ ssidstring +'\n', 'pwd '+ ssidpwd +'\n', 'opmode normal\n', 'softap disable\n', 'exit\n'])
+    processcmd = cmd(ser, ['restore defaults\n','tempunit C','use ntp\n', 'tz_off ' + tz_off + '\n', 'backup tz\n', 'ssid '+ ssidstring +'\n', 'pwd '+ ssidpwd +'\n', 'opmode normal\n', 'softap disable\n', 'exit\n'])
     #processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off ' + tz_off + '\n', 'backup tz\n', 'ssid Acknet\n', 'pwd millicat75\n', 'exit\n'])
     time.sleep(3)
 
@@ -601,6 +601,47 @@ def prepForCal(ser):
     processcmd = cmd(ser, ['restore defaults\n', 'tempunit C\n', 'tz_off -4\n', 'temp_off 0\n' + 'hum_off 0\n' + 'backup all\n', 'ssid '+ ssidstring +'\n', 'pwd '+ ssidpwd +'\n', 'opmode offline\n', 'softap disable\n', 'exit\n'])
     #processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off -4\n', 'backup tz\n', 'ssid Acknet\n', 'pwd millicat75\n', 'exit\n'])
     time.sleep(3)
+
+def readfromsd(ser):
+        batchlist = []
+        logging.info ("reading files on SD card...")
+        thisEgg.filelist = []
+        processcmd = cmd(ser, ['list files\n'])
+        time.sleep(3)
+        # need a new way to count files and determine when reading is complete
+        # technically, count files until first blank line would do it if we took local control here
+        readuntilblank(ser);
+
+        print('here is the file list - ')
+        print(thisEgg.filelist)
+        if len(thisEgg.filelist) == 0:
+            print('No files to read!')
+        else:
+            print('DEBUG! Here is the whole filelist!')
+            for filename in thisEgg.filelist:
+                if filename[:1] == "7":   #linux epoch file to be deleted, one at a time
+                    print(filename)
+                    processcmd = cmd(ser, ['delete ' + str(filename) + '\n'])
+                else:
+                    batchlist.append(filename)
+                    print('DEBUG! appended to batchlist!')
+
+            print('DEBUG! Here is the whole batchlist!' + str(batchlist))
+
+            numberoffiles = len(batchlist)
+            if numberoffiles > 1:
+                downloadlist = sorted(batchlist)
+                print('DEBUG! Here is the whole downloadlist list!' + str(downloadlist))
+                processcmd = cmd(ser, ['download ' + str(downloadlist[0])[:8] + ' ' + str(downloadlist[-1])[:8] + '\n'])
+            elif numberoffiles == 1:
+                print('DEBUG! - single file download')
+                processcmd = cmd(ser, ['download ' + str(batchlist[0]) + '\n'])
+            else:
+                print('no files remaining...')
+
+        time.sleep(1)
+        logging.debug('deleted all csv files from SD...')
+
 
 def clearsd(ser):
         batchlist = []
@@ -641,6 +682,24 @@ def clearsd(ser):
 
         time.sleep(1)
         logging.debug('deleted all csv files from SD...')
+
+def seteggtime(mode):
+    if mode = "ntp":
+        print("setting egg time...")
+        # send RTC / NTP commands and reset
+        while thisEgg.ntpok is False:
+            ser.close()  # In case the port is already open this closes it.
+            ser.open()   # Reopen the port.
+            getconfigmode(ser)
+            getsettings(ser)
+            thisEgg.passeggtests()
+            setrtcwithntp(ser)
+
+        # verify rtc set
+        print('finished RTC config.')
+    else:
+
+
 
 def main():
 
@@ -716,18 +775,8 @@ def main():
     thisEgg.passeggtests()
 
     if app.appmode == 'RTC':
-        logging.info ("setting NTP time...")
-        # send RTC / NTP commands and reset
-        while thisEgg.ntpok is False:
-            ser.close()  # In case the port is already open this closes it.
-            ser.open()   # Reopen the port.
-            getconfigmode(ser)
-            getsettings(ser)
-            thisEgg.passeggtests()
-            setrtcwithntp(ser)
-
-        # verify rtc set
-        print('finished RTC config.')
+        seteggtime('ntp')
+        
         # restart
         #  are there esp reload issues?
           #Info: ESP8266 Firmware Version is up to date
