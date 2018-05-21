@@ -5,15 +5,14 @@ import datetime
 import serial.tools.list_ports
 import traceback
 import logging
-from Tkinter import *
-import tkFont
-import gettemp
+#from Tkinter import *
+#import tkFont
 
 # declare once
 ser = serial.Serial()
 #declare pass fail conditions
-fwver = '2.2.3'
-fwsig = '334761 60245'
+fwver = '2.2.4'
+fwsig = '310731 37905'
 tz_off = '-4'
 timezone = tz_off + '.000000000'
 host = 'mqtt.wickeddevice.com'
@@ -32,25 +31,25 @@ class App:
                              command=self.end_program)
         self.button.pack(side=LEFT)
         self.mode_mqtt = Button(frame,
-                             text="BALANCE ALL EGGS\n" + host,
+                             text="set MQTT to\n" + host,
                              height=10, width=30, font=helv36,
                              command=self.run_program)
         self.mode_mqtt.pack(side=LEFT)
         self.mode_setrtc = Button(frame,
-                             text="Discover All Eggs",  font=helv36,
+                             text="RTC load",  font=helv36,
                              height=10, width=30,
-                             command=self.disc_mode)
+                             command=self.rtc_mode)
         self.mode_setrtc.pack(side=LEFT)
 
     def run_program(self):
-        print("TempHum balancing in progress!")
-        self.appmode = 'BALANCE'
+        print("setting mqttsrv!")
+        self.appmode = 'MQTT'
         if __name__ == "__main__":
             main()
 
-    def disc_mode(self):
-        print("Running Discover mode!")
-        self.appmode = 'DISCOVER'
+    def rtc_mode(self):
+        print("Running RTC mode!")
+        self.appmode = 'RTC'
         if __name__ == "__main__":
             main()
 
@@ -60,9 +59,7 @@ class App:
         time.sleep(1)
         root.destroy()
 
-class ComPort:
-    def __init__(self):
-        self.eggserial = ''
+
 
 class Egg:
 
@@ -82,7 +79,6 @@ class Egg:
         self.co2value = 0.0
         self.firmsig = ''
         self.ntpok = False
-        self.opmode = 'unknown'
         self.firstread = []
         self.macaddr = ''
         self.mqtthost = ''
@@ -97,13 +93,8 @@ class Egg:
         self.filelist = []
 
     def introduce(self):
-        print('serial {1}, type {2}, firmware ver {3}, op {4}'.format(self, self.eggserial, self.eggtype, self.eggversion, self.opmode))
-        logging.info('serial {1}, type {2}, firmware ver {3}, op {4}'.format(self, self.eggserial, self.eggtype, self.eggversion, self.opmode))
-
-    def getoffsets(self):
-        print('temp offset {1}, hum offset {2}, tz offset {3}'.format(self, self.tempoff, self.humoff, self.tzoff))
-        logging.info('temp offset {1}, hum offset {2}, tz offset {3}'.format(self, self.tempoff, self.humoff, self.tzoff))
-
+        print('eggserial {1}, eggtype {2}, firmware version {3}'.format(self, self.eggserial, self.eggtype, self.eggversion))
+        logging.info('eggserial {1}, eggtype {2}, firmware version {3}'.format(self, self.eggserial, self.eggtype, self.eggversion))
 
     def passeggtests(self):
         print('wdpass {1}, slotpass {2},  spipass {3}, sdpass {4}, sht25pass {5}, rtcpass {6}, esppass {7} '.format(self, self.wdpass, self.slotpass, self.spipass, self.sdpass, self.sht25pass, self.rtcpass, self.esppass))
@@ -123,17 +114,17 @@ class Egg:
         logging.info(rtcmsg)
 
     def finaltest(self):
-        print ('eggserial: ' + self.eggserial)
+        print('eggserial: ' + self.eggserial)
         logging.info (self.eggserial)
         logging.info (self.macaddr)
         logging.info (self.mqtthost)
         self.allpass = True
         if self.eggversion == fwver:
             logging.info ('PASS',)
-            print ('PASS - Firmware version up to date' + self.eggversion)
+            print('PASS - Firmware version up to date' + self.eggversion)
         else:
             logging.error ('FAIL',)
-            print ('FAIL - Firmware version incorrect' + self.eggversion)
+            print('FAIL - Firmware version incorrect' + self.eggversion)
             self.allpass = False
         logging.info ('Firmware version ' + self.eggversion)
         if self.rtcpass == True:
@@ -171,10 +162,10 @@ class Egg:
             self.allpass = False
 
         if (300.0 < self.co2value) and (self.co2value < 1300.0):
-            print 'CO2 value in bounds - ' + str(self.co2value)
+            print('CO2 value in bounds - ' + str(self.co2value))
             self.co2pass = True
         else:
-            print 'CO2 value out of bounds - ' + str(self.co2value)
+            print('CO2 value out of bounds - ' + str(self.co2value))
             self.co2pass = False
             self.allpass = False
 
@@ -188,41 +179,43 @@ class Egg:
 
         #reinstate this for final testing
         #if (self.tempoff <> 0.0) and (self.humoff <> 0.0):
-        #    print ('PASS - temp and humidity offsets are nonzero')
+        #    print('PASS - temp and humidity offsets are nonzero')
         #else:
-        #    print ('FAIL - temp and/or humidity offsets not entered')
+        #    print('FAIL - temp and/or humidity offsets not entered')
         #    self.allpass = False
 
         if self.dlfile == True:
-            print ('PASS - file download OK')
+            print('PASS - file download OK')
         else:
-            print ('FAIL - failed to download files from the SD card')
+            print('FAIL - failed to download files from the SD card')
             self.allpass = False
 
         if self.allpass == True:
-            print ('PASS - egg passes all tests.  Ready for temp and humidity testing.')
+            print('PASS - egg passes all tests.  Ready for temp and humidity testing.')
             logging.info ('PASS - egg passes all tests.  Ready for temp and humidity testing.')
         else:
-            print ('FAIL - egg failed at least one test above.  Try running tests again.')
+            print('FAIL - egg failed at least one test above.  Try running tests again.')
             logging.info  ('FAIL - egg failed at least one test above.  Try running tests again.')
 
-
+thisEgg = Egg()
 
 lastfile = 0
 
 def parseEggData(thisEgg, words):
     ignoreline = False
     numwords = len(words)
-    print('how many words - ' + str(numwords))
     csvdate = ''
     global datarowsread
     global offlinemode
     filelist = []
-    print(words)
     #print('debug! number of words ' + str(numwords))
+
 
     if numwords > 3:
         try:
+            if words[0] == "OPERATIONAL":
+                thisEgg.eggtype = 'CO2'
+
             if words[1] == "CO2":
                 thisEgg.eggtype = 'CO2'
 
@@ -270,14 +263,6 @@ def parseEggData(thisEgg, words):
                         thisEgg.mqttconnack = True
                     else:
                         thisEgg.mqttconnack = False
-            elif words[0] == "OPERATIONAL":
-                print ('here - word 5 is ' + words[5])
-                if words[5] == "12":
-                    # about to enter config mode
-                    return "selftestOK"
-
-
-
 
 
                 if words[3] == "Access":
@@ -292,7 +277,7 @@ def parseEggData(thisEgg, words):
 
             elif words[1] == "Getting":
                 if words[2] == "NTP":
-                    time.sleep(2)
+                    time.sleep(3)
                     wordslen = len(words)
                     print('length of array is ' + str(wordslen))
                     if wordslen > 3:
@@ -310,7 +295,7 @@ def parseEggData(thisEgg, words):
                       logging.debug (timemin)
                       logging.debug (ntpmin)
                       #if timehour == ntphour:  would be cool if our actual time matched the egg time
-                      print str(int(timehour)+1) + ' ' + str(int(ntphour))
+                      print(str(int(timehour)+1) + ' ' + str(int(ntphour)))
                       if (int(timehour)+1) == int(ntphour):
                           timediff = int(ntpmin)- int(timemin)
                           if abs(timediff) < 5:
@@ -340,14 +325,13 @@ def parseEggData(thisEgg, words):
 
             elif words[0] == "Humidity":
                 thisEgg.humoff = float(words[4])
-                return "selftestOK"
 
             else:
                 # don't set any eggvars
                 pass
         except:
-            print sys.exc_info()[0]
-            print traceback.format_exc()
+            print(sys.exc_info()[0])
+            print(traceback.format_exc())
 
     elif numwords == 3:
         try:
@@ -366,11 +350,11 @@ def parseEggData(thisEgg, words):
 
             elif words[0] == "csv:":
                 # because this line is 3 words, it's a data row
-                #print 'debug: csv!'
+                #print('debug: csv!')
                 rightnow = datetime.datetime.now()
                 csvdate = rightnow.strftime("%m/%d/%y")
-                print csvdate,
-                print str(words[2])
+                print(csvdate,)
+                print(str(words[2]))
                 logging.info(csvdate + ' ' + str(words[2]))
                 datarowsread += 1
                 print('Debug! datarows - ' + str(datarowsread) )
@@ -379,8 +363,8 @@ def parseEggData(thisEgg, words):
                     return 'done'
 
                 else:
-                    print 'csv data incoming!'
-                    print str(words)
+                    print('csv data incoming!')
+                    print(str(words))
                     newlist = []
                     for word in words:
                         word = word.split(",")
@@ -388,8 +372,8 @@ def parseEggData(thisEgg, words):
 
 
                     co2val =  str(newlist[2][3])
-                    print co2val
-                    print (float(co2val))
+                    print(co2val)
+                    print(float(co2val))
                     thisEgg.co2value = float(co2val)
 
                     # break out data from csv string
@@ -399,31 +383,21 @@ def parseEggData(thisEgg, words):
 
             elif str(words[2]) == csvdate:
                 firstread = { 'serial' : thisEgg.serial, 'time' : str(words[2]), 'temp' : str(words[3]), 'hum' : str(words[4])}
-                print firstread
+                print(firstread)
                 thisEgg.firstread = firstread
                 thisEgg.uploadok = True
 
-            elif words[0] == 'Operational':
-                if words[2]  == 'Normal':
-                    thisEgg.opmode = "normal"
-                elif words[2] == 'Offline':
-                    thisEgg.opmode = "offline"
-                print("opmode " + thisEgg.opmode)
-
-
-
             elif words[1] == 'Done':
                 if words[2]  == 'downloading.':
-                #    print 'Debug!  Download finished.'
+                #    print('Debug!  Download finished.')
                     return 'done'
-
 
             else:
                 pass
                 # do we care about any other two (three) word lines?
         except:
-            print sys.exc_info()[0]
-            print traceback.format_exc()
+            print(sys.exc_info()[0])
+            print(traceback.format_exc())
 
     elif numwords == 2:
         try:
@@ -436,9 +410,9 @@ def parseEggData(thisEgg, words):
                 thisEgg.filelist.append(filename)
                 thisEgg.downloadok = True
                 lastfile = len(thisEgg.filelist)
-                print 'DEBUG! ' + filename + " , " + filedate
-                print 'DEBUG! ' + str(filelist)
-                print 'DEBUG! ' + str(lastfile) + ' files found'
+                print('DEBUG! ' + filename + " , " + filedate)
+                print('DEBUG! ' + str(filelist))
+                print('DEBUG! ' + str(lastfile) + ' files found')
             elif words[0] == "csv:":
 
                 # because this line is 2 words, it's a HEADER row
@@ -453,67 +427,62 @@ def parseEggData(thisEgg, words):
 
                 #rightnow = datetime.datetime.now()
                 #csvdate = rightnow.strftime("%m/%d/%y")
-                #print csvdate
-                #print str(words[2])
+                #print(csvdate)
+                #print(str(words[2]))
                 #TODO: need a pass fail condition
             else:
                 # any other 2 word combination we care about
                 pass
 
         except:
-            print sys.exc_info()[0]
-            print traceback.format_exc()
+            print(sys.exc_info()[0])
+            print(traceback.format_exc())
 
     elif numwords == 0:
         try:
             return 'blank'
 
         except:
-            print sys.exc_info()[0]
-            print traceback.format_exc()
+            print(sys.exc_info()[0])
+            print(traceback.format_exc())
 
 
-def readserial(thisEgg, ser, numlines):
+def readserial(ser, numlines):
     parsereturn = ''
     blankcount = 0
     readcount = 0
     readmore = True
-    print('in readserial')
     while readmore:
         rcv1 = ""
         rcv1 = ser.readline()
         words = rcv1.split()
-        settings = rcv1.split(":")
-        #print(settings)
         parsereturn = parseEggData(thisEgg, words)
         if parsereturn == 'done':
-            print 'Debug! we are all done reading'
+            print('Debug! we are all done reading')
             blankcount = 0
             readmore = False
-        elif parsereturn == 'selftestOK':
-            print 'we are done with getsettings - should have everything you need.'
-            readmore = False
         elif parsereturn == 'espupd':
-            print 'Debug! just got done with ESP8266 update, restart and redo ntp'
+            print('Debug! just got done with ESP8266 update, restart and redo ntp')
+        elif parsereturn == 'config':
+            print('***THIS IS WHERE YOU SHOULD TYPE AQE IF YOU WANT CONFIG MODE***')
         elif parsereturn == 'blank':
             blankcount = blankcount + 1
             if blankcount > 7:
                 print('Debug! more than a minute has passed, continuing')
                 readmore = False
             else:
-                pass
-                #print('Debug! = waiting... ' + str(blankcount) + '0 seconds')
+                print('Debug! = waiting... ' + str(blankcount) + '0 seconds')
 
         else:
-            print('(' + str(readcount) + ') ' + rcv1 + ' ' + str(numlines))
-            #print('(' + str(readcount) + ') ' + rcv1)
+            #print('(' + str(readcount) + ') ' + rcv1 + ' ' + str(numlines))
+            print('(' + str(readcount) + ') ' + rcv1)
             blankcount = 0
         readcount = readcount + 1
         if (readcount > numlines):
             readcount = 0
             readmore = False
-            #print 'finished reading...'
-            #print 'read in ' + str(numlines) + ' lines'
+            print('finished reading...')
+            print('read in ' + str(numlines) + ' lines')
         else:
            pass
 
@@ -528,11 +497,11 @@ def readuntilblank(ser):
         words = rcv1.split()
         parsereturn = parseEggData(thisEgg, words)
         if parsereturn == 'done':
-            print 'Debug! we are all done reading'
+            print('Debug! we are all done reading')
             blankcount = 0
             readmore = False
         #elif parsereturn == 'espupd':
-        #    print 'Debug! just got done with ESP8266 update, restart and redo ntp'
+        #    print('Debug! just got done with ESP8266 update, restart and redo ntp')
         elif parsereturn == 'blank':
             blankcount = blankcount + 1
             if blankcount > 0:
@@ -543,84 +512,71 @@ def readuntilblank(ser):
 
         else:
             #print('(' + str(readcount) + ') ' + rcv1 + ' ' + str(numlines))
-            #print('(' + str(readcount) + ') ' + rcv1)
+            print('(' + str(readcount) + ') ' + rcv1)
             blankcount = 0
         readcount = readcount + 1
         #if (readcount > numlines):
         #    readcount = 0
         #    readmore = False
-        #    print 'finished reading...'
-        #    print 'read in ' + str(numlines) + ' lines'
+        #    print('finished reading...')
+        #    print('read in ' + str(numlines) + ' lines')
         #else:
         #   pass
 
-def cmd(ser, cmdlist):
+def cmd (ser, cmdlist):
     for cmd in cmdlist:
         ser.write(cmd)
-        print cmd
-        #time.sleep(1)
-        #(ser, 1)
+        print(cmd)
+        time.sleep(1)
     return 'command list processed...'
 
-def geteggdata(thisEgg, ser):
-    thisEgg.introduce()
-    thisEgg.getoffsets()
 
-def getconfigmode(thisEgg, ser):
-
+def getconfigmode(ser):
+    processcmd = ''
+    ser.close()  # In case the port is already open this closes it.
+    ser.open()   # Reopen the port.
+    time.sleep(3)
     processcmd = cmd(ser, ['aqe\n'])
-
-    #ser.close()  # In case the port is already open this closes it.
-    #time.sleep(1)
-    #ser.open()   # Reopen the port.
-
+    time.sleep(1)
     #get just enough of header to determine egg type
-    readserial(thisEgg, ser, 6)
-
+    readserial(ser, 6)
+    thisEgg.introduce()
     if thisEgg.eggtype == 'CO2':
         #immediately read 10 more lines
-        readserial(thisEgg, ser, 10)
-    elif thisEgg.eggtype == 'Particulate':
-        #new particulate egg, read 11 more lines
-        readserial(thisEgg, ser, 11)
+        readserial(ser, 10)
     else:
         #gas egg, immediately read 15 more lines
-        readserial(thisEgg, ser, 15)
-    #time.sleep(1)
-    processcmd = cmd(ser, ['aqe\n'])
+        readserial(ser, 13)
+    time.sleep(4)
 
-
-def getsettings(thisEgg, ser):
-    #if thisEgg.eggtype == 'CO2':
-    #    print('CO2 egg...')
-    #    readserial(thisEgg, ser, 77)
-    #elif thisEgg.eggtype == 'VOC':
-    #    print('VOC egg...')
-    #    readserial(thisEgg, ser, 88)
-    #elif thisEgg.eggtype == 'Particulate':
-    #    print('Particulate egg...')
-    #    readserial(thisEgg, ser, 73)
-    #elif thisEgg.eggtype == 'NO2CO':
-    #    print('NO2CO egg...')
-    #    readserial(thisEgg, ser, 74)
-    #else:
-    print ("*** " + thisEgg.eggtype + " ***")
-    readserial(thisEgg, ser, 88)
+def getsettings(ser):
+    if thisEgg.eggtype == 'CO2':
+        print('CO2 egg...')
+        readserial(ser, 77)
+    elif thisEgg.eggtype == 'VOC':
+        print('VOC egg...')
+        readserial(ser, 88)
+    elif thisEgg.eggtype == 'Particulate':
+        print('Particulate egg...')
+        readserial(ser, 73)
+    else:
+        print(thisEgg.eggtype)
+        readserial(ser, 99)
 
     # CO2 egg displays 75 lines after AQE
-    #readserial(thisEgg, ser, 75)
+    #readserial(ser, 75)
 
     # gas egg displays 99 lines after AQE
-    #readserial(thisEgg, ser, 99)
+    #readserial(ser, 99)
+    time.sleep(1)
 
-
-def setrtcwithntp(thisEgg, ser):
+def setrtcwithntp(ser):
     processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off ' + tz_off + '\n', 'backup tz\n', 'ssid '+ ssidstring +'\n', 'pwd '+ ssidpwd +'\n', 'exit\n'])
     #processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off ' + tz_off + '\n', 'backup tz\n', 'ssid Acknet\n', 'pwd millicat75\n', 'exit\n'])
     time.sleep(3)
     thisEgg.rtctest()
     logging.info ("restarting...")
-    readserial(thisEgg, ser, 77)
+    readserial(ser, 77)
     #ser.close()  # In case the port is already open this closes it.
     #ser.open()   # Reopen the port.
 
@@ -630,7 +586,7 @@ def setmqttsrv(ser):
     #processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off -4\n', 'backup tz\n', 'ssid Acknet\n', 'pwd millicat75\n', 'exit\n'])
     time.sleep(3)
 
-def clearsd(thisEgg, ser):
+def clearsd(ser):
         batchlist = []
         logging.info ("reading files on SD card...")
         thisEgg.filelist = []
@@ -641,7 +597,7 @@ def clearsd(thisEgg, ser):
         readuntilblank(ser);
 
         print('here is the file list - ')
-        print (thisEgg.filelist)
+        print(thisEgg.filelist)
         if len(thisEgg.filelist) == 0:
             print('No files to delete!')
         else:
@@ -677,160 +633,152 @@ def main():
     logging.info('***Initialized - appmode ' + app.appmode + '***')
 
 
-    print 'initializing appmode ' + app.appmode + '...'
-    thisEgg = {}
+    print('initializing appmode ' + app.appmode + '...')
     serPort = ""
     totalPorts = 0
     portcount = 0
     eggComPort = ""
-    eggComPorts = []
     eggCount = 0
-    openComPort = ""
     processcmd = ""
     eggNotFound = True
-    eggObjectList = []
-    eggSerialList = []
-    eggtemps = {}
-    #why is this global
     global offlinemode
-
     while eggNotFound:
 
         # Find Live Ports
         ports = list(serial.tools.list_ports.comports())
         totalPorts = len(ports)
-        print "there are " + str(totalPorts) + " com ports available"
+        print("there are " + str(totalPorts) + " com ports available")
 
         for p in ports:
-            print p # This causes each port's information to be printed out.
+            print(p)  # This causes each port's information to be printed out.
             # To search this p data, use p[2].
 
             if "FTDI" in p[2]:  # Looks for "FTDI" in P[2].
-                print "there is an air quality egg on " + p[0]
+                print("there is an air quality egg on " + p[0])
                 eggComPort = p[0]
-                print "Found AQE on " + eggComPort
+                print("Found AQE on " + eggComPort)
                 eggNotFound = False
                 #note- as soon as any egg is found, loop ends.
                 eggCount = eggCount + 1
 
             if "USB VID:PID" in p[2]:  # Looks for "PID" in P[2].
-                print "LINUX! there is an open com port on " + p[0]
-                openComPort = p[0]
-                if "/dev/ttyUSB" in openComPort:
-                    print "there is an egg on " + openComPort
-                    eggComPorts.append(openComPort)
-                    print "Found AQE on " + eggComPort
-                    eggNotFound = False
-                    #note- as soon as any egg is found, loop ends.
-                    eggCount = eggCount + 1
-                else:
-                    print openComPort + "is not an egg."
+                print("LINUX! there is an air quality egg on " + p[0])
+                eggComPort = p[0]
+                print("Found AQE on " + eggComPort)
+                eggNotFound = False
+                #note- as soon as any egg is found, loop ends.
+                eggCount = eggCount + 1
 
             if portcount == totalPorts-1:
-                if eggCount == 0:
-                    print "egg not found!"
+                if eggNotFound:
+                    print("egg not found!")
                     time.sleep(.5)
                 else:
-                    print "There were " + str(eggCount) + " eggs found."
+                    print("There were " + str(eggCount) + " eggs found.")
 
-                    portcount = totalPorts  #kick out of this while loop and read ports again
+                    #portcount = totalPorts  #kick out of this while loop and read ports again
 
                 #sys.exit() # Terminates Script.
-            portcount = portcount + 1
+            #portcount = portcount + 1
 
         time.sleep(1)  # pause before looping again-  check ports again in 2 seconds
     time.sleep(2)  # Gives user 2 seconds to view Port information
-    print(eggComPorts)
-    print("There is your list")
-    egg = 1
-    thisPort = ""
-    for thisPort in eggComPorts:
-        #thisPort = eggComPorts[(egg-1)]
+
+    # Set Port
+    ser = serial.Serial(eggComPort, 115200, timeout=10) # Put in your speed and timeout value.
+    ser.close()  # In case the port is already open this closes it.
+    ser.open()   # Reopen the port.
+
+    ser.flushInput()
+    ser.flushOutput()
+    print("connected to port " + eggComPort)
+
+    getconfigmode(ser)
+    getsettings(ser)
+    thisEgg.passeggtests()
+
+    if app.appmode == 'RTC':
+        logging.info ("setting NTP time...")
+        # send RTC / NTP commands and reset
+        setrtcwithntp(ser)
+        # verify rtc set
+
+        # restart
+        #  are there esp reload issues?
+          #Info: ESP8266 Firmware Version is up to date
+        #  watch for online data transmit via mqtt
+        # set opmode offline and exit
+        # verify offline data collection to sd card
+        # restart
+        # list files
+        # download files
+        # verify they look okay
+        # delete files from sd
+        # restore defaults, opmode offline, exit
+        #readserial(ser, 90)
+        ser.close()  # In case the port is already open this closes it.
+        ser.open()   # Reopen the port.
+
+        print("reconnecting to port " + eggComPort)
+        time.sleep(2)
 
 
-        # Set Port
-        try:
-            thisEgg = Egg()
-            print('created object')
-            ser = serial.Serial(thisPort, 115200, timeout=10) # Put in your speed and timeout value.
-            #ser.close()  # In case the port is already open this closes it.
-            #ser.open()   # Reopen the port.
-            ser.flushInput()
-            ser.flushOutput()
-            print "connected to port " + thisPort
-            print(thisEgg)
-            getconfigmode(thisEgg, ser)
-            getsettings(thisEgg, ser)
-            # #thisEgg.passeggtests()
-            # #-- comment this block --#
-            # if app.appmode == 'RTC':
-            #     logging.info ("setting NTP time...")
-            #     # send RTC / NTP commands and reset
-            #     setrtcwithntp(ser)
-            #     # verify rtc set
-            #
-            #     # restart
-            #     #  are there esp reload issues?
-            #       #Info: ESP8266 Firmware Version is up to date
-            #     #  watch for online data transmit via mqtt
-            #     # set opmode offline and exit
-            #     # verify offline data collection to sd card
-            #     # restart
-            #     # list files
-            #     # download files
-            #     # verify they look okay
-            #     # delete files from sd
-            #     # restore defaults, opmode offline, exit
-            #     #readserial(thisEgg, ser, 90)
-            #     ser.close()  # In case the port is already open this closes it.
-            #     ser.open()   # Reopen the port.
-            #
-            #     print("reconnecting to port " + thisPort)
-            print('you are here!')
-            #print(thisEgg.eggserial)
-            #if thisEgg.eggserial == 'egg008045060d9b0120':
-            #    print('made it')
-            #    newtempoff = '0.65'
-            #    newhumoff = '0.68'
-            #    processcmd = cmd(ser, ['temp_off ' + newtempoff + '\n', 'hum_off ' + newhumoff + '\n', 'backup all\n', 'opmode normal\n', 'softap disable\n','ssid '+ ssidstring +'\n', 'pwd '+ ssidpwd +'\n', 'exit\n'])
-            #    #processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off -4\n', 'backup tz\n', 'ssid Acknet\n', 'pwd millicat75\n', 'exit\n'])
+        logging.info('setting offline mode...')
+        processcmd = cmd(ser, ['aqe\n'])
+        readserial(ser, 95)
+        time.sleep(2)
+        clearsd(ser)
+        time.sleep(1)
+        processcmd = cmd(ser, ['restore defaults\n'])
+        time.sleep(2)
+        processcmd = cmd(ser, ['opmode offline\n', 'exit\n'])
+        offlinemode = True
+        logging.info ("restarting...")
+        ser.close()  # In case the port is already open this closes it.
+        ser.open()   # Reopen the port.
+        readserial(ser, 40)
+        logging.info ("restarting...")
+        ser.close()  # In case the port is already open this closes it.
+        ser.open()   # Reopen the port.
+        logging.debug ("reconnecting to port " + eggComPort)
+        time.sleep(2)
+        logging.info ("reading files on SD card...")
+        processcmd = cmd(ser, ['aqe\n'])
+        time.sleep(1)
+        thisEgg.filelist = []
+        processcmd = cmd(ser, ['list files\n'])
+        readserial(ser, 97)
+        if len(thisEgg.filelist) == 0:
+            print('No files to download.  FAIL')
+            logging.info('No files to download.  FAIL')
+            thisEgg.dlfile = False
+        else:
+            processcmd = cmd(ser, ['download ' + str(thisEgg.filelist[lastfile]) + '\n'])
+            readserial(ser, 100)
+            logging.debug ('Finished downloading...')
+            thisEgg.dlfile = True
+        clearsd(ser)
+        logging.debug('deleted all csv files from SD...')
+        thisEgg.finaltest()
+        logging.info('***************************************')
+        logging.info(' ')
+        logging.info(' ')
+    elif app.appmode == 'MQTT':
+        logging.info ("setting mqttsrv...")
+        setmqttsrv(ser)
+    else:
+        print('Unknown appmode.')
 
-            #    print('egg updated')
-            #    getconfigmode(thisEgg, ser)
-            #    getsettings(thisEgg, ser)
-            print('finished with com port ' + thisPort)
-            geteggdata(thisEgg, ser)
-            egg = egg + 1
-            eggObjectList.append(thisEgg)
-            print eggObjectList
 
-            ser.close()  # In case the port is already open this closes it.
-            ser.open()   # Reopen the port.
-            ser.close()  # In case the port is already open this closes it.
-        except Exception as err:
-            template = "Error {0} occurred. Arguments:\n{1!r}"
-            message = template.format(type(err).__name__, err.args)
-            print message
-                #if err.errno == 16:
-                #  print("Could not open com port " + thisPort +".  Is it open in another application?")
-                #else:
-                #  print("an error occurred, but we are not sure exactly what happened - Error: " + err.errno)
-                #egg = egg + 1
-    print('That is all the com ports there are.\n')
 
-    #print(" list - " + eggObjectList)
-    for rock in eggObjectList:
-        print('the rockID is :' + rock.eggserial)
-        eggSerialList.append(rock.eggserial)
-        print eggSerialList
-    eggtemps = gettemp.getEggList(eggSerialList)
-    print(eggtemps)
+
+
 
     print('***CLICK A BUTTON TO RUN AGAIN***')
     return
 
 
-root = Tk()
-helv36 = tkFont.Font(family='Helvetica', size=9, weight='bold')
+root = tkinter.Tk()
+helv36 = root.tkFont.Font(family='Helvetica', size=9, weight='bold')
 app = App(root)
 root.mainloop()
