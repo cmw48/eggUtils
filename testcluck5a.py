@@ -5,8 +5,8 @@ import datetime
 import serial.tools.list_ports
 import traceback
 import logging
-from Tkinter import *
-import tkFont
+#from Tkinter import *
+#import tkFont
 
 # declare once
 ser = serial.Serial()
@@ -30,11 +30,11 @@ class App:
                              height=10, width=30,  font=helv36,
                              command=self.end_program)
         self.button.pack(side=LEFT)
-        self.mode_calprep = Button(frame,
-                             text="prep for temp\n" + "and hum cal",
+        self.mode_mqtt = Button(frame,
+                             text="set MQTT to\n" + host,
                              height=10, width=30, font=helv36,
                              command=self.run_program)
-        self.mode_calprep.pack(side=LEFT)
+        self.mode_mqtt.pack(side=LEFT)
         self.mode_setrtc = Button(frame,
                              text="RTC load",  font=helv36,
                              height=10, width=30,
@@ -42,8 +42,8 @@ class App:
         self.mode_setrtc.pack(side=LEFT)
 
     def run_program(self):
-        print("prepping egg for calibration!")
-        self.appmode = 'CALPREP'
+        print("setting mqttsrv!")
+        self.appmode = 'MQTT'
         if __name__ == "__main__":
             main()
 
@@ -106,15 +106,12 @@ class Egg:
 
     def rtctest(self):
         if self.ntpok:
-            rtcdone = True
-            rtcstatus = "PASS"
+            rtcmsg = "PASS - "
         else:
-            rtcdone = False
-            rtcstatus = "FAIL"
-        rtcmsg = rtcstatus + " - tz offset: " + str(self.tzoff) + "  NTP set: " + str(self.ntpok)
+            rtcmsg = "FAIL - "
+        rtcmsg = rtcmsg + "tz offset: " + str(self.tzoff) + "  NTP set: " + str(self.ntpok)
         print(rtcmsg)
         logging.info(rtcmsg)
-        return rtcstatus
 
     def finaltest(self):
         print('eggserial: ' + self.eggserial)
@@ -212,15 +209,12 @@ def parseEggData(thisEgg, words):
     global offlinemode
     filelist = []
     #print('debug! number of words ' + str(numwords))
-    #print(words)
 
 
     if numwords > 3:
         try:
             if words[0] == "OPERATIONAL":
-                return 'config'
-            if words[2] == "verify":
-                return 'done'
+                thisEgg.eggtype = 'CO2'
 
             if words[1] == "CO2":
                 thisEgg.eggtype = 'CO2'
@@ -292,33 +286,29 @@ def parseEggData(thisEgg, words):
                       timehack = now.strftime("%H:%M:%S")
                       print('Debug! ' + words[3] + ' ' + words[4] )
                       ntptime = str(words[4])
-                      print(timehack)
-                      print(ntptime)
+                      logging.debug (timehack)
+                      logging.debug (ntptime)
                       timehour = timehack[:2]
                       ntphour = ntptime[:2]
                       timemin = timehack[3:5]
                       ntpmin = ntptime[3:5]
-                      print(timemin)
-                      print(ntpmin)
+                      logging.debug (timemin)
+                      logging.debug (ntpmin)
                       #if timehour == ntphour:  would be cool if our actual time matched the egg time
-                      # have to add a +1 to timehour for DST
-                      dst = 0
-                      timehournum = (int(timehour)+dst)
-                      ntphournum = int(ntphour)
-                      print(str(timehournum) + ' ' + str(ntphournum))
-                      if (timehournum == ntphournum):
+                      print(str(int(timehour)+1) + ' ' + str(int(ntphour)))
+                      if (int(timehour)+1) == int(ntphour):
                           timediff = int(ntpmin)- int(timemin)
                           if abs(timediff) < 5:
-                              print('Debug!  time is within 5 mins of system time')
+                              logging.debug ('Debug!  time is within 5 mins of system time')
                               thisEgg.ntpok = True
                               thisEgg.rtctest()
                           else:
-                              print('Debug!  RTC time does not match system time')
+                              logging.debug ('Debug!  RTC time does not match system time')
                               thisEgg.rtctest()
                     else:
                         # wordlen > 3 means we didn't get ntp time
                         print('***Something went wrong, need to retry getting NTP***')
-                        thisEgg.ntpok = False
+
             elif words[1] == "Current":
                 firmwaresig = str(words[4]) + str(words[5])
                 thisEgg.firmsig = firmwaresig
@@ -474,11 +464,7 @@ def readserial(ser, numlines):
         elif parsereturn == 'espupd':
             print('Debug! just got done with ESP8266 update, restart and redo ntp')
         elif parsereturn == 'config':
-            if configmodeon:
-                print('Entering config mode')
-                readmore = False
-            else:
-                print('continuing to operation mode...')
+            print('***THIS IS WHERE YOU SHOULD TYPE AQE IF YOU WANT CONFIG MODE***')
         elif parsereturn == 'blank':
             blankcount = blankcount + 1
             if blankcount > 7:
@@ -546,7 +532,6 @@ def cmd (ser, cmdlist):
 
 
 def getconfigmode(ser):
-    configmodeon = True
     processcmd = ''
     ser.close()  # In case the port is already open this closes it.
     ser.open()   # Reopen the port.
@@ -558,10 +543,10 @@ def getconfigmode(ser):
     thisEgg.introduce()
     if thisEgg.eggtype == 'CO2':
         #immediately read 10 more lines
-        readserial(ser, 20)
+        readserial(ser, 10)
     else:
         #gas egg, immediately read 15 more lines
-        readserial(ser, 20)
+        readserial(ser, 13)
     time.sleep(4)
 
 def getsettings(ser):
@@ -586,62 +571,20 @@ def getsettings(ser):
     time.sleep(1)
 
 def setrtcwithntp(ser):
-    rtcstatus = thisEgg.rtctest()
-    processcmd = cmd(ser, ['restore defaults\n','tempunit C','use ntp\n', 'tz_off ' + tz_off + '\n', 'backup tz\n', 'ssid '+ ssidstring +'\n', 'pwd '+ ssidpwd +'\n', 'opmode normal\n', 'softap disable\n', 'exit\n'])
+    processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off ' + tz_off + '\n', 'backup tz\n', 'ssid '+ ssidstring +'\n', 'pwd '+ ssidpwd +'\n', 'softap disable\n', 'exit\n'])
     #processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off ' + tz_off + '\n', 'backup tz\n', 'ssid Acknet\n', 'pwd millicat75\n', 'exit\n'])
     time.sleep(3)
-
+    thisEgg.rtctest()
     logging.info ("restarting...")
     readserial(ser, 77)
     #ser.close()  # In case the port is already open this closes it.
     #ser.open()   # Reopen the port.
 
 
-def prepForCal(ser):
-    processcmd = cmd(ser, ['restore defaults\n', 'tempunit C\n', 'tz_off -4\n', 'temp_off 0\n' + 'hum_off 0\n' + 'backup all\n', 'ssid '+ ssidstring +'\n', 'pwd '+ ssidpwd +'\n', 'opmode offline\n', 'softap disable\n', 'exit\n'])
+def setmqttsrv(ser):
+    processcmd = cmd(ser, ['restore defaults\n', 'mqttsrv ' + host + '\n', 'backup all\n', 'ssid '+ ssidstring +'\n', 'pwd '+ ssidpwd +'\n', 'exit\n'])
     #processcmd = cmd(ser, ['restore defaults\n', 'use ntp\n', 'tz_off -4\n', 'backup tz\n', 'ssid Acknet\n', 'pwd millicat75\n', 'exit\n'])
     time.sleep(3)
-
-def readfromsd(ser):
-        batchlist = []
-        logging.info ("reading files on SD card...")
-        thisEgg.filelist = []
-        processcmd = cmd(ser, ['list files\n'])
-        time.sleep(3)
-        # need a new way to count files and determine when reading is complete
-        # technically, count files until first blank line would do it if we took local control here
-        readuntilblank(ser);
-
-        print('here is the file list - ')
-        print(thisEgg.filelist)
-        if len(thisEgg.filelist) == 0:
-            print('No files to read!')
-        else:
-            print('DEBUG! Here is the whole filelist!')
-            for filename in thisEgg.filelist:
-                if filename[:1] == "7":   #linux epoch file to be deleted, one at a time
-                    print(filename)
-                    processcmd = cmd(ser, ['delete ' + str(filename) + '\n'])
-                else:
-                    batchlist.append(filename)
-                    print('DEBUG! appended to batchlist!')
-
-            print('DEBUG! Here is the whole batchlist!' + str(batchlist))
-
-            numberoffiles = len(batchlist)
-            if numberoffiles > 1:
-                downloadlist = sorted(batchlist)
-                print('DEBUG! Here is the whole downloadlist list!' + str(downloadlist))
-                processcmd = cmd(ser, ['download ' + str(downloadlist[0])[:8] + ' ' + str(downloadlist[-1])[:8] + '\n'])
-            elif numberoffiles == 1:
-                print('DEBUG! - single file download')
-                processcmd = cmd(ser, ['download ' + str(batchlist[0]) + '\n'])
-            else:
-                print('no files remaining...')
-
-        time.sleep(1)
-        logging.debug('deleted all csv files from SD...')
-
 
 def clearsd(ser):
         batchlist = []
@@ -683,25 +626,6 @@ def clearsd(ser):
         time.sleep(1)
         logging.debug('deleted all csv files from SD...')
 
-def seteggtime(mode):
-    if mode == "ntp":
-        print("setting egg time...")
-        # send RTC / NTP commands and reset
-        while thisEgg.ntpok is False:
-            ser.close()  # In case the port is already open this closes it.
-            ser.open()   # Reopen the port.
-            getconfigmode(ser)
-            getsettings(ser)
-            thisEgg.passeggtests()
-            setrtcwithntp(ser)
-
-        # verify rtc set
-        print('finished RTC config.')
-    else:
-        print("this is a timestamp set mode that we haven't built yet")
-
-
-
 def main():
 
     logging.basicConfig(filename='eggtest.log', level=logging.DEBUG)
@@ -718,8 +642,6 @@ def main():
     processcmd = ""
     eggNotFound = True
     global offlinemode
-    global configmodeon
-    configmodeon = False
     while eggNotFound:
 
         # Find Live Ports
@@ -776,7 +698,10 @@ def main():
     thisEgg.passeggtests()
 
     if app.appmode == 'RTC':
-        seteggtime('ntp')
+        logging.info ("setting NTP time...")
+        # send RTC / NTP commands and reset
+        setrtcwithntp(ser)
+        # verify rtc set
 
         # restart
         #  are there esp reload issues?
@@ -802,12 +727,11 @@ def main():
         processcmd = cmd(ser, ['aqe\n'])
         readserial(ser, 95)
         time.sleep(2)
-        #clearsd(ser)
-        #time.sleep(1)
+        clearsd(ser)
+        time.sleep(1)
         processcmd = cmd(ser, ['restore defaults\n'])
         time.sleep(2)
-        #processcmd = cmd(ser, ['opmode offline\n', 'exit\n'])
-        processcmd = cmd(ser, ['temp_off 0\n','hum_off 0\n','backup all\n','opmode offline\n','softap disable\n', 'exit\n'])
+        processcmd = cmd(ser, ['opmode offline\n', 'exit\n'])
         offlinemode = True
         logging.info ("restarting...")
         ser.close()  # In case the port is already open this closes it.
@@ -833,15 +757,15 @@ def main():
             readserial(ser, 100)
             logging.debug ('Finished downloading...')
             thisEgg.dlfile = True
-        #clearsd(ser)
-        #logging.debug('deleted all csv files from SD...')
+        clearsd(ser)
+        logging.debug('deleted all csv files from SD...')
         thisEgg.finaltest()
         logging.info('***************************************')
         logging.info(' ')
         logging.info(' ')
-    elif app.appmode == 'CALPREP':
-        logging.info ("prepping for calibration...")
-        prepForCal(ser)
+    elif app.appmode == 'MQTT':
+        logging.info ("setting mqttsrv...")
+        setmqttsrv(ser)
     else:
         print('Unknown appmode.')
 
@@ -854,7 +778,7 @@ def main():
     return
 
 
-root = Tk()
-helv36 = tkFont.Font(family='Helvetica', size=9, weight='bold')
+root = tkinter.Tk()
+helv36 = root.tkFont.Font(family='Helvetica', size=9, weight='bold')
 app = App(root)
 root.mainloop()
