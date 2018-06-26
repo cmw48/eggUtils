@@ -683,7 +683,7 @@ def clearsd(ser):
         time.sleep(1)
         logging.debug('deleted all csv files from SD...')
 
-def seteggtime(mode):
+def seteggtime(ser, mode):
     if mode == "ntp":
         print("setting egg time...")
         # send RTC / NTP commands and reset
@@ -776,7 +776,7 @@ def main():
     thisEgg.passeggtests()
 
     if app.appmode == 'RTC':
-        seteggtime('ntp')
+        seteggtime(ser,'ntp')
 
         # restart
         #  are there esp reload issues?
